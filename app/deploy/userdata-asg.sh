@@ -15,10 +15,10 @@ sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-c
 # dbhostname=`aws ssm get-parameter     --name "dbhostname"     --with-decryption --region aws-region --output text --query Parameter.Value`
 
 
-export VTT_DBUSER=`aws ssm get-parameter     --name "dbusername"     --with-decryption --region aws-region --output text --query Parameter.Value`
-export VTT_DBPASSWORD=`aws ssm get-parameter     --name "dbpassword"     --with-decryption --region aws-region --output text --query Parameter.Value`
+export VTT_DBUSER=`aws ssm get-parameter     --name "dbusername" --with-decryption --region aws-region --output text --query Parameter.Value`
+export VTT_DBPASSWORD=`aws ssm get-parameter --name "dbpassword" --with-decryption --region aws-region --output text --query Parameter.Value`
 export VTT_DBNAME=`aws ssm get-parameter     --name "dbname"     --with-decryption --region aws-region --output text --query Parameter.Value`
-export VTT_DBHOST=`aws ssm get-parameter     --name "dbhostname"     --with-decryption --region aws-region --output text --query Parameter.Value`
+export VTT_DBHOST=`aws ssm get-parameter     --name "dbhostname" --with-decryption --region aws-region --output text --query Parameter.Value`
 export VTT_LISTENHOST=`ec2metadata --local-ipv4`
 export VTT_DBPORT=5432
 export VTT_LISTENPORT=3000
