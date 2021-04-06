@@ -27,7 +27,7 @@ export VTT_LISTENPORT=3000
 
 
 #cd TechChallengeApp/;sudo ./build.sh;cd dist;
-sudo git clone https://github.com/servian/TechChallengeApp.git
+sudo git clone app-repo
 cd TechChallengeApp/
 export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
 cd ..
