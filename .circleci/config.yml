@@ -126,8 +126,8 @@ jobs:
 
   terraform_deploy:
     docker:
-      #- image: golang:1.15
-      - image: 722c/circle-ci-ubuntu-python-3
+      - image: golang:1.15
+      #- image: 722c/circle-ci-ubuntu-python-3
     description: Deploying Infra
     steps:
       - checkout
