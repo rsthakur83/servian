@@ -1,3 +1,56 @@
+# # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
+# version: 2.1
+# # Use a package of configuration called an orb.
+# orbs:
+#   # Declare a dependency on the welcome-orb
+#   welcome: circleci/welcome-orb@0.4.1
+# # Orchestrate or schedule a set of jobs
+# workflows:
+#   # Name the workflow "welcome"
+#   welcome:
+#     # Run the welcome/run job in its own container
+#     jobs:
+#       - welcome/run
+
+# dependencies:
+#   pre:
+#     - go get github.com/tcnksm/ghr
+
+# compile:
+#   override:
+#     - ant package
+
+# deployment:
+#   release:
+#     tag: /(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)/
+#     commands:
+#       - ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` output/
+
+# version: 2.1
+# workflows:
+#   main:
+#     jobs:
+#       - build
+# jobs:
+#   build:
+#     machine:
+#       image: windows-server-2019-nvidia:stable
+#       docker_layer_caching: true    # default - false
+
+# version: 2.1
+
+# orbs:
+#   win: circleci/windows@2.3.0
+
+# jobs:
+#   build:
+#     executor: win/default
+#     steps:
+#       - checkout
+#       - run: echo 'Hello, Windows'
+
+
+
 version: 2.1
 orbs:
   github-release: h-matsuo/github-release@0.1.1
@@ -24,6 +77,13 @@ jobs:
            ../terraform init
            ../terraform plan
            ../terraform apply --auto-approve  
+#   build:
+#     docker:
+#       - image: circleci/golang:1.12  
+#     description: Create dummy file and publish a new release tagged `vX.Y.Z`.
+#     executor: github-release/default
+#     steps:
+#       - checkout
 
   build:
     docker:
@@ -50,10 +110,23 @@ jobs:
             mkdir artifacts
             zip -r v${RELEASE_NUMBER}.zip dist
             cp v${RELEASE_NUMBER}.zip artifacts
-            aws s3 cp artifacts/v${RELEASE_NUMBER}.zip s3://${app_artifact_bucket}/      
+            aws s3 cp artifacts/v${RELEASE_NUMBER}.zip s3://${app_artifact_bucket}/
+
+#       - github-release/create:
+#             title: Release Version ${RELEASE_NUMBER}
+#             description: This Release Version is ${RELEASE_NUMBER}
+            #go get github.com/tcnksm/ghr
+            #if [[ $TAG =~ "-" ]]; then
+            #  echo "It's a PRE-Release!"
+            #  ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  v${RELEASE_NUMBER}  -b "${BODY}" 
+            #else
+            #  echo "It's a Release!"
+            #  ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete   -n v${RELEASE_NUMBER}  -b "${BODY}"
+            #fi             
 
   terraform_deploy:
     docker:
+      #- image: golang:1.15
       - image: 722c/circle-ci-ubuntu-python-3
     description: Deploying Infra
     steps:
@@ -77,8 +150,8 @@ jobs:
             chmod +x terraform  
             cp terraform /bin          
             cd app
-            sed -i  "s/app_artifact_bucket/$app_artifact_bucket/g" deploy/userdata-asg.sh
-            sed -i  "s/app_artifact_bucket/$app_artifact_bucket/g" deploy/iam-role-policy.tf
+            sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" deploy/userdata-asg.sh
+            sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" deploy/iam-role-policy.tf
             sed -i  "s/aws-region/$aws_region/g" deploy/backend.tf
             sed -i  "s/aws-region/$aws_region/g" deploy/userdata-asg.sh
             sed -i  "s/aws-region/$aws_region/g" deploy.sh
@@ -86,11 +159,11 @@ jobs:
             #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc1/userdata-asg.sh
             #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc2/userdata-asg.sh
             chmod +x deploy.sh
-            #sed -i 's/\r$//' deploy.sh
-            sed -i  "s/\r$//" deploy.sh
+            sed -i 's/\r$//' deploy.sh            
             ./deploy.sh            
   release: 
     docker:
+      #- image: circleci/golang:1.12 
       - image: golang:1.15
     steps:   
       - checkout
@@ -106,6 +179,10 @@ jobs:
             export MAJOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f1)"
             export MINOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f2)"
             export PATCH="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f3)"
+            #export TAG="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2)"
+            #export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
+            #export RELEASE_MESSAGE="$(git describe --tags `git rev-list --tags --max-count=1` || true)"
+            #export RELEASE_MESSAGE="$(git log -1 --pretty=%B)"
             res="$(git describe --tags --match=$VERSION_BRANCH* --abbrev=0)"
             echo $res
             echo $RELEASE_MESSAGE
@@ -126,9 +203,12 @@ jobs:
             mkdir artifacts
             aws s3 cp  s3://${app_artifact_bucket}/v${RELEASE_NUMBER}.zip artifacts/
 
+            echo $SHA
             export BODY="## Release Notes
             ${COMMIT_MESSAGE}"
             go get github.com/tcnksm/ghr
+            #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} -prerelease ${TAG}
+            #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -prerelease ${TAG}
             if [[ $TAG =~ "-" ]]; then
               echo "It's a PRE-Release!"
               ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  v${RELEASE_NUMBER}  -b "${BODY}" -prerelease "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"   ./artifacts
