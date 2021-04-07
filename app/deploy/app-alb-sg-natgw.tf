@@ -58,10 +58,6 @@ resource "aws_route_table_association" "app-subnet2-routes" {
 }
 
 
-
-### SECURITY GROUPS #########################
-
-
 # Public Subnet Groups required by load balancer
 
 resource "aws_subnet" "pub_subnet_1" {
