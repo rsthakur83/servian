@@ -126,7 +126,7 @@ jobs:
 
   terraform_deploy:
     docker:
-      - image: hashicorp/terraform:light
+      - image: 722c/circle-ci-ubuntu-python-3
       #- image: 722c/circle-ci-ubuntu-python-3
     description: Deploying Infra
     steps:
