@@ -71,8 +71,8 @@ jobs:
             echo "[default]"  >> /root/.aws/credentials
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials
-            wget https://releases.hashicorp.com/terraform/0.14.0/terraform_0.14.0_linux_amd64.zip
-            unzip terraform_0.14.0_linux_amd64.zip
+            wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
+            unzip terraform_0.12.0_linux_amd64.zip
             chmod +x terraform
             cp terraform /bin
             cd app
@@ -96,8 +96,8 @@ jobs:
          name: "Terraform S3 backend Bucket"
          command: |
            apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
-           wget https://releases.hashicorp.com/terraform/0.14.0/terraform_0.14.0_linux_amd64.zip
-           unzip terraform_0.14.0_linux_amd64.zip
+           wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
+           unzip terraform_0.12.0_linux_amd64.zip
            chmod +x terraform
            mkdir /root/.aws/
            echo "[default]"  >> /root/.aws/credentials
