@@ -1,56 +1,3 @@
-# # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
-# version: 2.1
-# # Use a package of configuration called an orb.
-# orbs:
-#   # Declare a dependency on the welcome-orb
-#   welcome: circleci/welcome-orb@0.4.1
-# # Orchestrate or schedule a set of jobs
-# workflows:
-#   # Name the workflow "welcome"
-#   welcome:
-#     # Run the welcome/run job in its own container
-#     jobs:
-#       - welcome/run
-
-# dependencies:
-#   pre:
-#     - go get github.com/tcnksm/ghr
-
-# compile:
-#   override:
-#     - ant package
-
-# deployment:
-#   release:
-#     tag: /(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)/
-#     commands:
-#       - ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` output/
-
-# version: 2.1
-# workflows:
-#   main:
-#     jobs:
-#       - build
-# jobs:
-#   build:
-#     machine:
-#       image: windows-server-2019-nvidia:stable
-#       docker_layer_caching: true    # default - false
-
-# version: 2.1
-
-# orbs:
-#   win: circleci/windows@2.3.0
-
-# jobs:
-#   build:
-#     executor: win/default
-#     steps:
-#       - checkout
-#       - run: echo 'Hello, Windows'
-
-
-
 version: 2.1
 orbs:
   github-release: h-matsuo/github-release@0.1.1
@@ -77,13 +24,6 @@ jobs:
            ../terraform init
            ../terraform plan
            ../terraform apply --auto-approve  
-#   build:
-#     docker:
-#       - image: circleci/golang:1.12  
-#     description: Create dummy file and publish a new release tagged `vX.Y.Z`.
-#     executor: github-release/default
-#     steps:
-#       - checkout
 
   build:
     docker:
@@ -110,23 +50,10 @@ jobs:
             mkdir artifacts
             zip -r v${RELEASE_NUMBER}.zip dist
             cp v${RELEASE_NUMBER}.zip artifacts
-            aws s3 cp artifacts/v${RELEASE_NUMBER}.zip s3://${app_artifact_bucket}/
-
-#       - github-release/create:
-#             title: Release Version ${RELEASE_NUMBER}
-#             description: This Release Version is ${RELEASE_NUMBER}
-            #go get github.com/tcnksm/ghr
-            #if [[ $TAG =~ "-" ]]; then
-            #  echo "It's a PRE-Release!"
-            #  ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  v${RELEASE_NUMBER}  -b "${BODY}" 
-            #else
-            #  echo "It's a Release!"
-            #  ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete   -n v${RELEASE_NUMBER}  -b "${BODY}"
-            #fi             
+            aws s3 cp artifacts/v${RELEASE_NUMBER}.zip s3://${app_artifact_bucket}/      
 
   terraform_deploy:
     docker:
-      #- image: golang:1.15
       - image: 722c/circle-ci-ubuntu-python-3
     description: Deploying Infra
     steps:
@@ -144,9 +71,8 @@ jobs:
             echo "[default]"  >> /root/.aws/credentials
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials 
-            wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
-            #wget https://releases.hashicorp.com/terraform/0.14.0/terraform_0.14.0_linux_amd64.zip
-            unzip terraform_0.12.0_linux_amd64.zip
+            wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.14.0_linux_amd64.zip
+            unzip terraform_0.14.0_linux_amd64.zip
             chmod +x terraform  
             cp terraform /bin          
             cd app
@@ -156,14 +82,36 @@ jobs:
             sed -i  "s/aws-region/$aws_region/g" deploy/userdata-asg.sh
             sed -i  "s/aws-region/$aws_region/g" deploy.sh
             sed -i  "s/app-repo/$app_repo/g"     deploy/userdata-asg.sh
-            #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc1/userdata-asg.sh
-            #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc2/userdata-asg.sh
             chmod +x deploy.sh
             sed -i 's/\r$//' deploy.sh            
-            ./deploy.sh            
+            ./deploy.sh
+
+  app_status:
+    docker:
+      - image: golang:1.15
+    steps:
+      - checkout
+      - run: apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
+      - run:
+         name: "Terraform S3 backend Bucket"
+         command: |
+           apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
+           wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.14.0_linux_amd64.zip
+           unzip terraform_0.14.0_linux_amd64.zip
+           chmod +x terraform
+           mkdir /root/.aws/
+           echo "[default]"  >> /root/.aws/credentials
+           echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
+           echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
+           cd statebucket; chmod +x check.sh ; chmod +x status.sh
+           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" state.tf  
+           ../terraform init
+           sed -i 's/\r$//'  status.sh 
+           sed -i 's/\r$//'  check.sh  
+           ../statebucket/check.sh 
+           
   release: 
     docker:
-      #- image: circleci/golang:1.12 
       - image: golang:1.15
     steps:   
       - checkout
@@ -175,24 +123,6 @@ jobs:
             echo "[default]"  >> /root/.aws/credentials
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials  
-            export RELEASE_MESSAGE="$(git describe --tags `git rev-list --tags --max-count=1` || true)"
-            export MAJOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f1)"
-            export MINOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f2)"
-            export PATCH="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f3)"
-            #export TAG="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2)"
-            #export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
-            #export RELEASE_MESSAGE="$(git describe --tags `git rev-list --tags --max-count=1` || true)"
-            #export RELEASE_MESSAGE="$(git log -1 --pretty=%B)"
-            res="$(git describe --tags --match=$VERSION_BRANCH* --abbrev=0)"
-            echo $res
-            echo $RELEASE_MESSAGE
-            echo $MAJOR
-            export SHA="$(git rev-parse --short HEAD)"
-            echo "export VERSION=$VERSION" >> $BASH_ENV
-            echo "export MAJOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f1)"" >> $BASH_ENV
-            echo "export MINOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f2)"" >> $BASH_ENV
-            echo "export PATCH="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f3)"" >> $BASH_ENV
-            echo "export RELEASE_MESSAGE="$(git describe --tags `git rev-list --tags --max-count=1` || true)"" >> $BASH_ENV
             git clone ${app_repo}
             cd TechChallengeApp/
             export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
@@ -202,13 +132,9 @@ jobs:
             cd ..
             mkdir artifacts
             aws s3 cp  s3://${app_artifact_bucket}/v${RELEASE_NUMBER}.zip artifacts/
-
-            echo $SHA
             export BODY="## Release Notes
             ${COMMIT_MESSAGE}"
             go get github.com/tcnksm/ghr
-            #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} -prerelease ${TAG}
-            #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -prerelease ${TAG}
             if [[ $TAG =~ "-" ]]; then
               echo "It's a PRE-Release!"
               ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  v${RELEASE_NUMBER}  -b "${BODY}" -prerelease "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"   ./artifacts
@@ -218,46 +144,12 @@ jobs:
               ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"  -b "${BODY}"  v${RELEASE_NUMBER}  ./artifacts
             fi
 
-  app_status:
-    docker:
-      #- image: hashicorp/terraform:light
-      - image: golang:1.15
-    steps:
-      - checkout
-      - run: apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
-      - run:
-         name: "Terraform S3 backend Bucket"
-         command: |
-           #wget https://releases.hashicorp.com/terraform/0.14.0/terraform_0.14.0_linux_amd64.zip
-           apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
-           wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
-           unzip terraform_0.12.0_linux_amd64.zip
-           chmod +x terraform
-           mkdir /root/.aws/
-           echo "[default]"  >> /root/.aws/credentials
-           echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
-           echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
-           cd statebucket; chmod +x check.sh ; chmod +x status.sh
-           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" state.tf  
-           #../terraform  state replace-provider -- -/aws hashicorp/aws
-           #../terraform init
-           ../terraform init
-           ls
-           pwd
-           echo `which bash`
-           echo `which sh`
-           sed -i 's/\r$//'  status.sh 
-           sed -i 's/\r$//'  check.sh  
-           #../statebucket/status.sh 
-           ../statebucket/check.sh  
-#       - run: ./statebucket/status.sh 
-#       - run: ./statebucket/check.sh         
-           
+ 
             
 
 workflows:
   version: 2
-  build_and_release:
+  build_deploy_check_release:
     jobs:
       - terraform_backend
       - build:
@@ -272,248 +164,3 @@ workflows:
       - release:
          requires:
             - app_status           
-#       - app_status:
-#          requires:
-#            - release
-
-#       - release:
-#           requires:
-#             - build
-        
-  
-  
-
-#       - github-release/create:
-#               tag: vX.YY1.ZZ-$SHA
-#               title: Version vX.YY1.ZZ-$SHA
-#               description: This release is version vX.YY1.ZZ-$SHA.
-#               pre-release: true
-          
-# version: 2.1
-# executors:
-#   default:
-#     docker:
-#       - image: circleci/python:3.6.1
-#     working_directory: ~/repo
-# orbs:
-#   version-control: tvx/version-control@0.1.7
-
-# commands:
-#     release:
-#       description: Publish a Github release using git tags
-#       parameters:
-#         github_token: 
-#           default: GITHUB_API_TOKEN     
-#           description: Your GitHub API token, defaults to GITHUB_API_TOKEN
-#           type: env_var_name
-#         release_message:
-#           description: Github release message
-#           type: string
-#           default: "thakur"  # optional
-#         release_name:
-#           description: GIT tag name
-#           type: string
-#           default: "v1thakur"  # optional    
-#         release_summary:
-#           default: RELEASE_SUMMARY
-#           description: Text to attach to Github release message
-#           type: env_var_name  # optional    
-#       steps:
-#         - run:
-#             name: Create release via Github API
-#             command: |
-#               echo $RELEASE_NAME
-#               echo $RELEASE_MESSAGE
-#               API="https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/releases?access_token=$GITHUB_API_TOKEN"
-#               DATA="{\"tag_name\": \"$RELEASE_NAME\",\"name\": \"$RELEASE_NAME\",\"body\": \"$RELEASE_MESSAGE\",\"target_commitish\": \"$CIRCLE_BRANCH\",\"draft\": false,\"prerelease\": false}"
-#               echo $DATA > data.json  # easier to debug
-#               cat data.json
-#               echo "Test payload is correctly formatted as JSON"
-#               echo $DATA | jq type
-#               curl -X POST -d @data.json -H "Content-Type: application/json, Accept: application/json" $API          
-
-# jobs:
-#   release:
-#     description: Publish a Github release using git tags
-#     executor: default  
-#          title: "Deployed pre-release"
-#       - run:
-#           command: |
-#             github-release release \
-#               --security-token << parameters.github-token-variable >> \
-#               --user << parameters.user >> \
-#               --repo << parameters.repository >> \
-#               --tag << parameters.tag >> \
-#               --name "<< parameters.title >>" \
-#               --description "<< parameters.description >>" \
-#               --target << parameters.target >> \
-#               <<# parameters.draft >> --draft <</ parameters.draft >> \
-#               <<# parameters.pre-release >> --pre-release <</ parameters.pre-release >>
-
-
-
-######################
-
-
-# version: 2.1
-# orbs:
-#   version-control: tvx/version-control@0.1.7
-# jobs:
-#   release:
-#     executor: default
-#     steps:
-#       - checkout
-#       - run:
-#           name: >-
-#             For dynamic variables that cannot be set/determined statically, and
-#             environment variable can be used
-# #           command: >
-# #             echo "export RELEASE_SUMMARY=\"Dynamic parameters can be prepended
-# #             to the release-message via env var.\"" >> $BASH_ENV
-
-#           commands: 
-#             create:
-#               description: Create a new release.
-#               parameters:
-#                 tag:
-#                   description: Git tag using as the version number of the release.
-#                   type: string
-#                 target:
-#                   description: Git commitish (commit SHA or branch name) containing the project you want to release.
-#                   type: string
-#                   default: $CIRCLE_SHA1
-#                 title:
-#                   description: Name of the release.
-#                   type: string
-#                 description:
-#                   description: Description of the release.
-#                   type: string
-#                 file-path:
-#                   description: |
-#                     File path to be uploaded.
-#                     If directory, all files in the directory will be uploaded.
-#                     If empty, just create a new release without uploading any files.
-#                   type: string
-#                   default: ""
-#                 draft:
-#                   description: Set true if the release is a draft.
-#                   type: boolean
-#                   default: false
-#                 pre-release:
-#                   description: Set true if the release is a pre-release.
-#                   type: boolean
-#                   default: false
-#               steps:
-#                 - internal__install-deps
-#                 - when:
-#                     condition: << parameters.file-path >>
-#                     steps:
-#                       - run:
-#                           name: "[github-release/create] Publish a new release with artifacts"
-#                           command: |
-#                             ghr \
-#                               --token << parameters.github-token-variable >> \
-#                               --username << parameters.user >> \
-#                               --repository << parameters.repository >> \
-#                               --commitish << parameters.target >> \
-#                               --name "<< parameters.title >>" \
-#                               --body "<< parameters.description >>" \
-#                               <<# parameters.draft >> --draft <</ parameters.draft >> \
-#                               <<# parameters.pre-release >> --prerelease <</ parameters.pre-release >> \
-#                                 << parameters.tag >> << parameters.file-path >>
-
-#       - version-control/release:
-#           release_name: release feature-1
-#           release_message: custom_message
-# workflows:
-#   build:
-#     jobs:
-#       - release
-
-
-# common-parameters: &common-parameters
-#   github-token-variable:
-#     description: Environment variable containing your GitHub personal access token.
-#     type: string
-#     default: $GITHUB_TOKEN
-#   user:
-#     description: GitHub repository user or organization.
-#     type: string
-#     default: $CIRCLE_PROJECT_USERNAME
-#   repository:
-#     description: GitHub repository.
-#     type: string
-#     default: $CIRCLE_PROJECT_REPONAME
-
-# commands:
-#   create:
-#     description: Create a new release.
-#     parameters:
-#       <<: *common-parameters
-#       tag:
-#         description: Git tag using as the version number of the release.
-#         type: string
-#       target:
-#         description: Git commitish (commit SHA or branch name) containing the project you want to release.
-#         type: string
-#         default: $CIRCLE_SHA1
-#       title:
-#         description: Name of the release.
-#         type: string
-#       description:
-#         description: Description of the release.
-#         type: string
-#       file-path:
-#         description: |
-#           File path to be uploaded.
-#           If directory, all files in the directory will be uploaded.
-#           If empty, just create a new release without uploading any files.
-#         type: string
-#         default: ""
-#       draft:
-#         description: Set true if the release is a draft.
-#         type: boolean
-#         default: false
-#       pre-release:
-#         description: Set true if the release is a pre-release.
-#         type: boolean
-#         default: false
-#     steps:
-#       - internal__install-deps
-#       - when:
-#           condition: << parameters.file-path >>
-#           steps:
-#             - run:
-#                 name: "[github-release/create] Publish a new release with artifacts"
-#                 command: |
-#                   ghr \
-#                     --token << parameters.github-token-variable >> \
-#                     --username << parameters.user >> \
-#                     --repository << parameters.repository >> \
-#                     --commitish << parameters.target >> \
-#                     --name "<< parameters.title >>" \
-#                     --body "<< parameters.description >>" \
-#                     <<# parameters.draft >> --draft <</ parameters.draft >> \
-#                     <<# parameters.pre-release >> --prerelease <</ parameters.pre-release >> \
-#                       << parameters.tag >> << parameters.file-path >>
-
-# examples:
-#   command-usage:
-#     description: >
-#       Auto generate tag-name, and release notes.
-#       Tag name is based on date. (release 190313.1348)
-#       Release notes are based on GIT commit messages since last tag. (list of commit messages)
-#     usage:
-#       version: 2.1
-#       orbs:
-#         version-control: tvx/version-control@0.1.7
-#       jobs:
-#         release:
-#           executor: default
-#           steps:
-#             - checkout
-#             - version-control/release
-#       workflows:
-#         build:
-#           jobs:
-#             - release
