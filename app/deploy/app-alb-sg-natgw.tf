@@ -27,7 +27,7 @@ resource "aws_route_table" "app-subnet-routes" {
   }
 
   tags = {
-    Name = "RT NAT Gateway"
+    Name = "RT NAT Gateway 1"
   }
 }
 
