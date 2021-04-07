@@ -1,5 +1,11 @@
 variable "aws_region" {
-  default = "us-east-1"
+  description= "AWS Region"
+  default = "us-east-1" 
+}
+
+variable "instance-type" {
+  description= "Instance Type"
+  default = "t2.micro" 
 }
 
 variable "image_id" {
