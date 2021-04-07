@@ -1,13 +1,191 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
+# # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
+# version: 2.1
+# # Use a package of configuration called an orb.
+# orbs:
+#   # Declare a dependency on the welcome-orb
+#   welcome: circleci/welcome-orb@0.4.1
+# # Orchestrate or schedule a set of jobs
+# workflows:
+#   # Name the workflow "welcome"
+#   welcome:
+#     # Run the welcome/run job in its own container
+#     jobs:
+#       - welcome/run
+# dependencies:
+#   pre:
+#     - go get github.com/tcnksm/ghr
+# compile:
+#   override:
+#     - ant package
+# deployment:
+#   release:
+#     tag: /(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)/
+#     commands:
+#       - ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace `git describe --tags` output/
+# version: 2.1
+# workflows:
+#   main:
+#     jobs:
+#       - build
+# jobs:
+#   build:
+#     machine:
+#       image: windows-server-2019-nvidia:stable
+#       docker_layer_caching: true    # default - false
+# version: 2.1
+# orbs:
+#   win: circleci/windows@2.3.0
+# jobs:
+#   build:
+#     executor: win/default
+#     steps:
+#       - checkout
+#       - run: echo 'Hello, Windows'
 version: 2.1
-# Use a package of configuration called an orb.
 orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
-# Orchestrate or schedule a set of jobs
+  github-release: h-matsuo/github-release@0.1.1
+jobs:
+  terraform_backend:
+    docker:
+      - image: hashicorp/terraform:light
+    steps:
+      - checkout
+      - run:
+         name: "Terraform S3 backend Bucket"
+         command: |
+           echo "CIRCLE_REPOSITORY_URL: ${CIRCLE_REPOSITORY_URL}"
+           wget https://releases.hashicorp.com/terraform/0.14.0/terraform_0.14.0_linux_amd64.zip
+           unzip terraform_0.14.0_linux_amd64.zip
+           chmod +x terraform
+           mkdir /root/.aws/
+           echo "[default]"  >> /root/.aws/credentials
+           echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
+           echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
+           cd backend
+           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" backend.tf
+           sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" backend.tf
+           ../terraform init
+           ../terraform plan
+           ../terraform apply --auto-approve  
+#   build:
+#     docker:
+#       - image: circleci/golang:1.12  
+#     description: Create dummy file and publish a new release tagged `vX.Y.Z`.
+#     executor: github-release/default
+#     steps:
+#       - checkout
+  build:
+    docker:
+      - image: golang:1.15
+    description: Creating  new release.
+    executor: github-release/default
+    steps:
+      - run:
+           name: "Git Clone and Build"
+           command: |
+            apt-get update; apt-get  -y install zip awscli
+            mkdir /root/.aws/
+            echo "[default]"  >> /root/.aws/credentials
+            echo "region = us-east-1" >> /root/.aws/credentials
+            echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
+            echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials               
+            git clone https://github.com/servian/TechChallengeApp.git
+            git clone ${app_repo}
+            cd TechChallengeApp/;./build.sh
+            #export RELEASE_NUMBER="$(git describe --tags `git rev-list --tags --max-count=1` || true)"
+            export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
+@@ -155,6 +155,7 @@ jobs:
+            sed -i  "s/aws-region/$aws_region/g" deploy/backend.tf
+            sed -i  "s/aws-region/$aws_region/g" deploy/userdata-asg.sh
+            sed -i  "s/aws-region/$aws_region/g" deploy.sh
+            sed -i  "s/app-repo/$app_repo/g"     deploy/userdata-asg.sh
+            #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc1/userdata-asg.sh
+            #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc2/userdata-asg.sh
+            chmod +x deploy.sh
+@@ -192,7 +193,7 @@ jobs:
+            echo "export MINOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f2)"" >> $BASH_ENV
+            echo "export PATCH="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f3)"" >> $BASH_ENV
+            echo "export RELEASE_MESSAGE="$(git describe --tags `git rev-list --tags --max-count=1` || true)"" >> $BASH_ENV
+            git clone https://github.com/servian/TechChallengeApp.git
+            git clone ${app_repo}
+            cd TechChallengeApp/
+            export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
+            export TAG="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
+            export RELEASE_MESSAGE="$(git log -1 --pretty=%B|head -1)"
+            export COMMIT_MESSAGE="$(git log -1 --pretty=%B)"
+            cd ..
+            mkdir artifacts
+            aws s3 cp  s3://${app_artifact_bucket}/v${RELEASE_NUMBER}.zip artifacts/
+            echo $SHA
+            export BODY="## Release Notes
+            ${COMMIT_MESSAGE}"
+            go get github.com/tcnksm/ghr
+            #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} -prerelease ${TAG}
+            #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -prerelease ${TAG}
+            if [[ $TAG =~ "-" ]]; then
+              echo "It's a PRE-Release!"
+              ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  v${RELEASE_NUMBER}  -b "${BODY}" -prerelease "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"   ./artifacts
+            else
+              echo "It's a Release!"
+              #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete   -n v${RELEASE_NUMBER}  -b "${BODY}"  v"${RELEASE_NUMBER}:${RELEASE_MESSAGE}"  ./artifacts
+              ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"  -b "${BODY}"  v${RELEASE_NUMBER}  ./artifacts
+            fi
+  app_status:
+    docker:
+      #- image: hashicorp/terraform:light
+      - image: golang:1.15
+    steps:
+      - checkout
+      - run: apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
+      - run:
+         name: "Terraform S3 backend Bucket"
+         command: |
+           #wget https://releases.hashicorp.com/terraform/0.14.0/terraform_0.14.0_linux_amd64.zip
+           apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
+           wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
+           unzip terraform_0.12.0_linux_amd64.zip
+           chmod +x terraform
+           mkdir /root/.aws/
+           echo "[default]"  >> /root/.aws/credentials
+           echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
+           echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
+           cd statebucket; chmod +x check.sh ; chmod +x status.sh
+           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" state.tf  
+           #../terraform  state replace-provider -- -/aws hashicorp/aws
+           #../terraform init
+           ../terraform init
+           ls
+           pwd
+           echo `which bash`
+           echo `which sh`
+           sed -i 's/\r$//'  status.sh 
+           sed -i 's/\r$//'  check.sh  
+           #../statebucket/status.sh 
+           ../statebucket/check.sh  
+#       - run: ./statebucket/status.sh 
+#       - run: ./statebucket/check.sh         
+           
+            
 workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
+  version: 2
+  build_and_release:
     jobs:
-      - welcome/run
+      - terraform_backend
+      - build:
+         requires:
+           - terraform_backend
+      - terraform_deploy:
+          requires: 
+            - build
+      - app_status:
+          requires:
+           - terraform_deploy         
+      - release:
+         requires:
+            - app_status           
+#       - app_status:
+#          requires:
+#            - release
+#       - release:
+#           requires:
+#             - build
