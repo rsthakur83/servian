@@ -70,20 +70,20 @@ jobs:
             echo "region = ${region}" >> /root/.aws/config
             echo "[default]"  >> /root/.aws/credentials
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
-            echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials 
+            echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials
             wget https://releases.hashicorp.com/terraform/0.14.0/terraform_0.14.0_linux_amd64.zip
             unzip terraform_0.14.0_linux_amd64.zip
-            chmod +x terraform  
-            cp terraform /bin          
+            chmod +x terraform
+            cp terraform /bin
             cd app
-            sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" deploy/userdata-asg.sh
-            sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" deploy/iam-role-policy.tf
-            sed -i  "s/aws-region/$aws_region/g" deploy/backend.tf
-            sed -i  "s/aws-region/$aws_region/g" deploy/userdata-asg.sh
-            sed -i  "s/aws-region/$aws_region/g" deploy.sh
-            sed -i  "s/app-repo/$app_repo/g"     deploy/userdata-asg.sh
+            sed -i  's/app_artifact_bucket/$app_artifact_bucket/g' deploy/userdata-asg.sh
+            sed -i  's/app_artifact_bucket/$app_artifact_bucket/g' deploy/iam-role-policy.tf
+            sed -i  's/aws-region/$aws_region/g' deploy/backend.tf
+            sed -i  's/aws-region/$aws_region/g' deploy/userdata-asg.sh
+            sed -i  's/aws-region/$aws_region/g' deploy.sh
+            sed -i  's/app-repo/$app_repo/g'     deploy/userdata-asg.sh
             chmod +x deploy.sh
-            sed -i 's/\r$//' deploy.sh            
+            sed -i 's/\r$//' deploy.sh
             ./deploy.sh
 
   app_status:
@@ -102,13 +102,13 @@ jobs:
            mkdir /root/.aws/
            echo "[default]"  >> /root/.aws/credentials
            echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
-           echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
+           echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials
            cd statebucket; chmod +x check.sh ; chmod +x status.sh
-           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" state.tf  
+           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" state.tf
            ../terraform init
-           sed -i 's/\r$//'  status.sh 
-           sed -i 's/\r$//'  check.sh  
-           ../statebucket/check.sh 
+           sed -i 's/\r$//'  status.sh
+           sed -i 's/\r$//'  check.sh
+           ../statebucket/check.sh
            
   release: 
     docker:
