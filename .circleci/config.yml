@@ -159,7 +159,9 @@ jobs:
             #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc1/userdata-asg.sh
             #sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" lc2/userdata-asg.sh
             chmod +x deploy.sh
-            sed -i 's/\r$//' deploy.sh            
+            echo 'i reached deploy.sh'
+            sed -i "s/\r$//" deploy.sh
+            echo 'i finished deploy.sh'
             ./deploy.sh            
   release: 
     docker:
