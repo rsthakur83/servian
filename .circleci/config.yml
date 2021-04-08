@@ -158,7 +158,7 @@ jobs:
             #sed -i  "s/app-repo/$app_repo/g"     deploy/userdata-asg.sh
             chmod +x deploy.sh
             echo "i reached deploy.sh"
-            sed -i  's/\r$//' deploy.sh
+            #sed -i  's/\r$//' deploy.sh
             echo "i finished deploy.sh"
             ./deploy.sh            
   release: 
