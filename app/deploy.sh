@@ -30,6 +30,7 @@ elif [ "$lc" == "$lcfg2" ];then
 	aws autoscaling delete-launch-configuration --launch-configuration-name $lcfg2
 
 else
+	### Creating Three Tier Architecture and deploying Servian APP on AWS using terraform
         cd deploy;terraform init;terraform plan ;terraform apply --auto-approve  #-var-file="var.tfvars" #-var-file="var.tfvars"
 	sleep 120
 fi
