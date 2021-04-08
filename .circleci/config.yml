@@ -41,8 +41,7 @@ jobs:
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials               
             git clone ${app_repo}
-            #cd TechChallengeApp/;./build.sh
-            cd demoapp/;./build.sh
+            cd TechChallengeApp/;./build.sh
             #export RELEASE_NUMBER="$(git describe --tags `git rev-list --tags --max-count=1` || true)"
             export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
             export RELEASE_MESSAGE="$(git log -1 --pretty=%B)"
@@ -136,7 +135,7 @@ jobs:
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials  
             git clone ${app_repo}
-            cd demoapp/
+            cd TechChallengeApp/
             export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
             export TAG="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
             export RELEASE_MESSAGE="$(git log -1 --pretty=%B|head -1)"
@@ -149,7 +148,7 @@ jobs:
             go get github.com/tcnksm/ghr
             if [[ $TAG =~ "-" ]]; then
               echo "It's a PRE-Release!"
-              #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  v${RELEASE_NUMBER}  -b "${BODY}" -prerelease "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"   ./artifacts
+              
               ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"  -b "${BODY}" -prerelease v${RELEASE_NUMBER}   ./artifacts
             else
               echo "It's a Release!"
