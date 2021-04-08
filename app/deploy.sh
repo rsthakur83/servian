@@ -18,8 +18,8 @@ if [ "$lc" == "$lcfg1" ];then
 	aws autoscaling delete-launch-configuration --launch-configuration-name $lcfg1
 
 elif [ "$lc" == "$lcfg2" ];then
-	### Creating LC1 Lauch Config and Updating ASG
-	echo "Creating LC1 Lauch Config and Updating ASG"
+	### Creating LC Lauch Config and Updating ASG
+	echo "Creating LC Lauch Config and Updating ASG"
 	vpc=`aws ec2 describe-vpcs --filters Name=tag:Name,Values='Servian App VPC' --query 'Vpcs[*].VpcId' --output text`
 	sg=`aws ec2  describe-security-groups --filter Name=vpc-id,Values=$vpc  Name=tag:Name,Values='APP SG' --region aws-region --query 'SecurityGroups[*].[GroupId]' --output text`	
 	aws autoscaling create-launch-configuration --launch-configuration-name $lcfg1 --key-name serkey --image-id ami-042e8287309f5df03 --instance-type t2.micro --iam-instance-profile  cwdb_iam_profile --security-groups $sg  --user-data file:///root/project/app/deploy/userdata-asg.sh
