@@ -61,9 +61,6 @@ jobs:
       - run:
            name: "Deploy Infra"
            command: |
-            echo `pwd`
-            which sh
-            which bash
             apt-get update; apt-get  -y install zip awscli  dos2unix unzip
             mkdir /root/.aws/
             echo "[default]" > /root/.aws/config
@@ -137,20 +134,6 @@ jobs:
             echo "[default]"  >> /root/.aws/credentials
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials  
-            export RELEASE_MESSAGE="$(git describe --tags `git rev-list --tags --max-count=1` || true)"
-            export MAJOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f1)"
-            export MINOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f2)"
-            export PATCH="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f3)"
-            res="$(git describe --tags --match=$VERSION_BRANCH* --abbrev=0)"
-            echo $res
-            echo $RELEASE_MESSAGE
-            echo $MAJOR
-            export SHA="$(git rev-parse --short HEAD)"
-            echo "export VERSION=$VERSION" >> $BASH_ENV
-            echo "export MAJOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f1)"" >> $BASH_ENV
-            echo "export MINOR="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f2)"" >> $BASH_ENV
-            echo "export PATCH="$(cat ravi1 |grep Version|awk '{print $2}'|cut -d '"' -f2|cut -d '.' -f3)"" >> $BASH_ENV
-            echo "export RELEASE_MESSAGE="$(git describe --tags `git rev-list --tags --max-count=1` || true)"" >> $BASH_ENV
             git clone ${app_repo}
             cd TechChallengeApp/
             export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
@@ -160,8 +143,6 @@ jobs:
             cd ..
             mkdir artifacts
             aws s3 cp  s3://${app_artifact_bucket}/v${RELEASE_NUMBER}.zip artifacts/
-
-            echo $SHA
             export BODY="## Release Notes
             ${COMMIT_MESSAGE}"
             go get github.com/tcnksm/ghr
@@ -170,7 +151,6 @@ jobs:
               ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n  v${RELEASE_NUMBER}  -b "${BODY}" -prerelease "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"   ./artifacts
             else
               echo "It's a Release!"
-              #ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete   -n v${RELEASE_NUMBER}  -b "${BODY}"  v"${RELEASE_NUMBER}:${RELEASE_MESSAGE}"  ./artifacts
               ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n "v${RELEASE_NUMBER}:${RELEASE_MESSAGE}"  -b "${BODY}"  v${RELEASE_NUMBER}  ./artifacts
             fi
         
