@@ -52,21 +52,3 @@ resource "aws_autoscaling_policy" "agents-scale-down-cpu" {
   cooldown               = 300
   autoscaling_group_name = aws_autoscaling_group.APP-ASG.name
 }
-
-
-
-resource "aws_autoscaling_policy" "agents-scale-up-mem" {
-  name                   = "agents-scale-up-mem"
-  scaling_adjustment     = 1
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 300
-  autoscaling_group_name = aws_autoscaling_group.APP-ASG.name
-}
-
-resource "aws_autoscaling_policy" "agents-scale-down-mem" {
-  name                   = "agents-scale-down-mem"
-  scaling_adjustment     = -1
-  adjustment_type        = "ChangeInCapacity"
-  cooldown               = 300
-  autoscaling_group_name = aws_autoscaling_group.APP-ASG.name
-}
