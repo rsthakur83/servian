@@ -150,15 +150,15 @@ jobs:
             chmod +x terraform
             cp terraform /bin
             cd app
-            sed -i -e 's/app_artifact_bucket/'"$app_artifact_bucket"'/g' deploy/userdata-asg.sh
-            sed -i -e 's/app_artifact_bucket/'"$app_artifact_bucket"'/g' deploy/iam-role-policy.tf
-            sed -i -e 's/aws-region/'"$aws_region"'/g' deploy/backend.tf
-            sed -i -e 's/aws-region/'"$aws_region"'/g' deploy/userdata-asg.sh
-            sed -i -e 's/aws-region/'"$aws_region"'/g' deploy.sh
-            sed -i -e 's/app-repo/'"$app_repo"'/g'     deploy/userdata-asg.sh
+            sed -i  's/app_artifact_bucket/'"$app_artifact_bucket"'/g' deploy/userdata-asg.sh
+            sed -i  's/app_artifact_bucket/'"$app_artifact_bucket"'/g' deploy/iam-role-policy.tf
+            sed -i  's/aws-region/'"$aws_region"'/g' deploy/backend.tf
+            sed -i  's/aws-region/'"$aws_region"'/g' deploy/userdata-asg.sh
+            sed -i  's/aws-region/'"$aws_region"'/g' deploy.sh
+            sed -i  's/app-repo/'"$app_repo"'/g'     deploy/userdata-asg.sh
             chmod +x deploy.sh
             echo "i reached deploy.sh"
-            sed -i -e 's/\r$//' deploy.sh
+            sed -i  's/\r$//' deploy.sh
             echo "i finished deploy.sh"
             ./deploy.sh            
   release: 
