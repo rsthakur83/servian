@@ -1,5 +1,5 @@
 variable "aws_region" {
-  default = "us-east-1"
+  default = "aws-region"
 }
 variable "image_id" {
   description = "Image id"
