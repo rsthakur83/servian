@@ -177,6 +177,8 @@ jobs:
           command: |
             apt-get update; apt-get  -y install zip awscli
             mkdir /root/.aws/
+            echo "[default]" > /root/.aws/config
+            echo "region = ${aws_region}" >> /root/.aws/config            
             echo "[default]"  >> /root/.aws/credentials
             echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials  
@@ -239,11 +241,15 @@ jobs:
            unzip terraform_0.12.0_linux_amd64.zip
            chmod +x terraform
            mkdir /root/.aws/
+           echo "[default]" > /root/.aws/config
+           echo "region = ${aws_region}" >> /root/.aws/config           
            echo "[default]"  >> /root/.aws/credentials
            echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
            echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
            cd statebucket; chmod +x check.sh ; chmod +x status.sh
-           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" state.tf  
+           #sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" state.tf
+           sed -i "s|terraform_state_bucket|$terraform_state_bucket|g"  state.tf
+           sed -i "s|aws-region|$aws_region|g" state.tf
            #../terraform  state replace-provider -- -/aws hashicorp/aws
            #../terraform init
            ../terraform init
