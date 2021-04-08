@@ -21,7 +21,8 @@ export VTT_LISTENPORT=3000
 # Check the latest release in the TechChallengeApp branch and copy the artifact from s3 bucket locally based on release version mentioned in root.go. 
 # Then finally start the App.
 sudo git clone app-repo
-cd TechChallengeApp/
+#cd TechChallengeApp/
+cd demoapp/
 export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
 cd ..
 aws s3 cp  s3://app_artifact_bucket/v${RELEASE_NUMBER}.zip .
