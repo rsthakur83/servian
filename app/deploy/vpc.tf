@@ -1,4 +1,4 @@
-# VPC
+#### VPC
 resource "aws_vpc" "app_vpc" {
   cidr_block           = var.aws_network_cidr
   enable_dns_support   = true
@@ -8,7 +8,7 @@ resource "aws_vpc" "app_vpc" {
   }
 }
 
-# Internet Gateway
+### Internet Gateway
 resource "aws_internet_gateway" "app_igw" {
   vpc_id = aws_vpc.app_vpc.id
   tags = {
@@ -16,12 +16,12 @@ resource "aws_internet_gateway" "app_igw" {
   }
 }
 
-# dhcp options
+#### dhcp options
 resource "aws_vpc_dhcp_options" "dns_resolver" {
   domain_name_servers = ["AmazonProvidedDNS"]
 }
 
-# Associate dhcp with vpc
+#### Associate dhcp with vpc
 resource "aws_vpc_dhcp_options_association" "dns_resolver" {
   vpc_id          = aws_vpc.app_vpc.id
   dhcp_options_id = aws_vpc_dhcp_options.dns_resolver.id
