@@ -1,4 +1,4 @@
-##### LAUCH Config 
+##### Launch Configuration
 resource "aws_launch_configuration" "APP-LC" {
   name                 = "APP-LC"
   depends_on           = ["aws_iam_role_policy_attachment.cw_db_policy_attach"] // "aws_security_group.APP-SG-Web"]  addressed required */
