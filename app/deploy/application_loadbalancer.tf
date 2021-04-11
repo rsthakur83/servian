@@ -34,6 +34,10 @@ resource "aws_lb_target_group" "APP-TargetGroup" {
     protocol            = "HTTP"
     matcher             = "200,202"
   }
+  tags = {
+    key                 = "Name"
+    value               = "App ALB"
+ }
 }
 
 # ALB Listener
