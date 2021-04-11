@@ -1,15 +1,4 @@
-############ LAUCH Config & Auto Scaling Group ########
-resource "aws_launch_configuration" "APP-LC" {
-  name                 = "APP-LC"
-  depends_on           = ["aws_iam_role_policy_attachment.cw_db_policy_attach"] // "aws_security_group.APP-SG-Web"]  addressed required */
-  image_id             = var.image_id
-  instance_type        = var.instance-type
-  iam_instance_profile = "cwdb_iam_profile"
-  security_groups      = [aws_security_group.app_asg.id]
-  user_data            = file("/root/project/app/deploy/userdata-asg.sh")
-  lifecycle { create_before_destroy = true }
-}
-
+#### Auto Scaling Group
 resource "aws_autoscaling_group" "APP-ASG" {
   name                      = "APP-ASG"
   depends_on                = ["aws_launch_configuration.APP-LC", "aws_db_instance.app_db"]
@@ -35,7 +24,7 @@ resource "aws_autoscaling_attachment" "asg_attachment_bar" {
   alb_target_group_arn   = aws_lb_target_group.APP-TargetGroup.arn
 }
 
-##Auto scaling Policy for APP-ASG
+##Auto scaling Group Policy for APP-ASG
 
 resource "aws_autoscaling_policy" "agents-scale-up-cpu" {
   name                   = "agents-scale-up-cpu"
