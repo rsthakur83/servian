@@ -43,9 +43,6 @@ jobs:
             git clone ${app_repo}
             cd TechChallengeApp/;./build.sh
             export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
-            export RELEASE_MESSAGE="$(git log -1 --pretty=%B)"
-            export BODY="## Rlease Notes
-            - ${RELEASE_MESSAGE}"
             mkdir artifacts
             zip -r v${RELEASE_NUMBER}.zip dist
             cp v${RELEASE_NUMBER}.zip artifacts
