@@ -5,6 +5,7 @@ jobs:
   terraform_backend:
     docker:
       - image: hashicorp/terraform:light
+    description: Create S3 to store terraform state file  
     steps:
       - checkout
       - run:
@@ -28,8 +29,7 @@ jobs:
   build:
     docker:
       - image: golang:1.15
-    description: Creating  new release.
-    executor: github-release/default
+    description: Build and Store Artifact on S3
     steps:
       - run:
            name: "Git Clone and Build"
