@@ -42,7 +42,6 @@ jobs:
             echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials               
             git clone ${app_repo}
             cd TechChallengeApp/;./build.sh
-            #export RELEASE_NUMBER="$(git describe --tags `git rev-list --tags --max-count=1` || true)"
             export RELEASE_NUMBER="$(cat cmd/root.go |grep Version|awk '{print $2}'|cut -d '"' -f2)"
             export RELEASE_MESSAGE="$(git log -1 --pretty=%B)"
             export BODY="## Rlease Notes
@@ -92,7 +91,6 @@ jobs:
 
   app_status:
     docker:
-      #- image: hashicorp/terraform:light
       - image: golang:1.15
     steps:
       - checkout
