@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 
 bucket1=`aws s3api list-buckets --query "Buckets[].Name" --output text |grep -E app_artifact_bucket  |awk '{print $1}'`
