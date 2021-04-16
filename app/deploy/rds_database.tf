@@ -47,10 +47,6 @@ resource "random_password" "password" {
   min_lower        = 1
   min_numeric      = 1
   override_special = "_%$"
-
-  tags = {
-    Name = "APP DB Password"
-  }
 }
 
 resource "aws_ssm_parameter" "db_username" {
