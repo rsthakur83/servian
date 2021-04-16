@@ -24,6 +24,8 @@ jobs:
            sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" bucket_check.sh
            sed -i "s/app_artifact_bucket/$app_artifact_bucket/g"       bucket_check.sh
            sed -i "s/app_artifact_bucket/$app_artifact_bucket/g"       backend.tf
+           chmod +x bucket_check.sh
+           ./bucket_check.sh
 
   build:
     docker:
