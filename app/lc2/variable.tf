@@ -3,5 +3,5 @@ variable "aws_region" {
 }
 variable "image_id" {
   description = "Image id"
-  default     = "ami-042e8287309f5df03"
+  default     = "ami-08962a4068733a2b6"
 }
