@@ -3,7 +3,7 @@
 ### High CPU usage metrics Alarm
 resource "aws_cloudwatch_metric_alarm" "cpu-high" {
   alarm_name          = "cpu-util-high"
-  alarm_description = "This metric monitor ec2 high cpu utilization"
+  alarm_description   = "This metric monitor ec2 high cpu utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "2"
   metric_name         = "CPUUtilization"
@@ -14,10 +14,10 @@ resource "aws_cloudwatch_metric_alarm" "cpu-high" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.APP-ASG.name
   }
-  alarm_actions     = [aws_autoscaling_policy.agents-scale-up-cpu.arn]
+  alarm_actions = [aws_autoscaling_policy.agents-scale-up-cpu.arn]
   tags = {
-    key                 = "Name"
-    value               = "App ASG High CPU Usage Alarm"
+    key   = "Name"
+    value = "App ASG High CPU Usage Alarm"
   }
 }
 
@@ -37,8 +37,8 @@ resource "aws_cloudwatch_metric_alarm" "cpu-low" {
   }
   alarm_actions = [aws_autoscaling_policy.agents-scale-down-cpu.arn]
   tags = {
-    key                 = "Name"
-    value               = "APP ASG Low CPU Usage Alarm"
+    key   = "Name"
+    value = "APP ASG Low CPU Usage Alarm"
 
- } 
+  }
 }

@@ -35,9 +35,9 @@ resource "aws_lb_target_group" "APP-TargetGroup" {
     matcher             = "200,202"
   }
   tags = {
-    key                 = "Name"
-    value               = "App ALB"
- }
+    key   = "Name"
+    value = "App ALB"
+  }
 }
 
 # ALB Listener

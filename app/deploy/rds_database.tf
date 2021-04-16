@@ -47,6 +47,10 @@ resource "random_password" "password" {
   min_lower        = 1
   min_numeric      = 1
   override_special = "_%$"
+
+  tags = {
+    Name = "APP DB Password"
+  }
 }
 
 resource "aws_ssm_parameter" "db_username" {
@@ -56,7 +60,7 @@ resource "aws_ssm_parameter" "db_username" {
   value       = var.db_user
 
   tags = {
-    Name = "APP DB"
+    Name = "APP DB Username"
   }
 }
 
@@ -67,7 +71,7 @@ resource "aws_ssm_parameter" "db_password" {
   value       = random_password.password.result
 
   tags = {
-    Name = "APP DB"
+    Name = "APP DB Password"
   }
 }
 
@@ -79,7 +83,7 @@ resource "aws_ssm_parameter" "db_name" {
   value       = var.db_name
 
   tags = {
-    Name = "App DB"
+    Name = "App DB Name"
   }
 }
 
@@ -91,6 +95,6 @@ resource "aws_ssm_parameter" "db_hostname" {
   value       = aws_db_instance.app_db.address
 
   tags = {
-    Name = "APP DB"
+    Name = "APP DB Hostname"
   }
 }
