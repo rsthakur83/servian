@@ -21,10 +21,9 @@ jobs:
            cd backend
            sed -i "s/aws-region/$aws_region/g" variable.tf
            sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" backend.tf
-           sed -i "s/app_artifact_bucket/$app_artifact_bucket/g" backend.tf
-           ../terraform init
-           ../terraform plan
-           ../terraform apply --auto-approve
+           sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" bucket_check.sh
+           sed -i "s/app_artifact_bucket/$app_artifact_bucket/g"       bucket_check.sh
+           sed -i "s/app_artifact_bucket/$app_artifact_bucket/g"       backend.tf
 
   build:
     docker:
