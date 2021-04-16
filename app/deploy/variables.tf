@@ -14,6 +14,7 @@ variable "image_id" {
   default     = "ami-08962a4068733a2b6"
 }
 
+
 variable "aws_network_cidr" {
   description = "Network CIDR"
   default     = "10.0.0.0/16"
