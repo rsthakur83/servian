@@ -10,7 +10,8 @@ variable "instance-type" {
 
 variable "image_id" {
   description = "Image id"
-  default     = "ami-042e8287309f5df03"
+//  default     = "ami-042e8287309f5df03" // us-east-1
+  default     = "ami-08962a4068733a2b6"
 }
 
 variable "aws_network_cidr" {
