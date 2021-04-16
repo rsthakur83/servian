@@ -1,8 +1,8 @@
 #!/bin/sh
 
+aws s3api list-buckets --query "Buckets[].Name" --output text |grep -E "$app_artifact_bucket" ; aws s3api list-buckets --query "Buckets[].Name" --output text |grep -E "$terraform_state_bucket" 
 
-
-if [[  ( bucket1 = "terraform_state_bucket" && bucket2 = "app_artifact_bucket" ) || ( bucket2 = "terraform_state_bucket" || bucket1 = "app_artifact_bucket" )  ]];then
+if [ $? -eq 0]; then
         echo "Bucket Exist"
 else
         echo "Bucket Doest Not Exist Creating!!!!!"
