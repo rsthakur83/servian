@@ -1,6 +1,6 @@
 variable "aws_region" {
   description = "AWS Region"
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "instance-type" {
@@ -51,12 +51,12 @@ variable "aws_pub_subnet_2_cidr" {
 
 variable "az_zone_1" {
   description = "Availability Zone"
-  default     = "us-east-1a"
+  default     = "us-east-2a"
 }
 
 variable "az_zone_2" {
   description = "Availability Zone"
-  default     = "us-east-1b"
+  default     = "us-east-2b"
 }
 
 
