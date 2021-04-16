@@ -79,9 +79,9 @@ jobs:
             sed -i  "s|terraform_state_bucket|$terraform_state_bucket|g" deploy/terraform_backend.tf
             sed -i  "s|aws-region|$aws_region|g" deploy/terraform_backend.tf
             sed -i  "s|terraform_state_bucket|$terraform_state_bucket|g" lc1/lc.tf
-            sed -i  "s|aws-region|$aws_region|g" lc1/variable.tf
+            sed -i  "s|aws-region|$aws_region|g" lc1/variables.tf
             sed -i  "s|terraform_state_bucket|$terraform_state_bucket|g" lc2/lc.tf
-            sed -i  "s|aws-region|$aws_region|g" lc2/variable.tf
+            sed -i  "s|aws-region|$aws_region|g" lc2/variables.tf
             sed -i  "s|aws-region|$aws_region|g" deploy.sh
             chmod +x deploy.sh
             echo "Execute deploy.sh"
