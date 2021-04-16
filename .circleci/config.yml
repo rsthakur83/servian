@@ -4,13 +4,15 @@ orbs:
 jobs:
   terraform_backend:
     docker:
-      - image: hashicorp/terraform:light
+            #- image: hashicorp/terraform:light
+      - image: golang:1.15
     description: Create S3 to store terraform state file  
     steps:
       - checkout
       - run:
          name: "Terraform S3 backend Bucket"
          command: |
+           apt-get update; apt-get  -y install zip awscli
            wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
            unzip terraform_0.12.0_linux_amd64.zip
            chmod +x terraform
