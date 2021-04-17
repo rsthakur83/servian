@@ -130,5 +130,5 @@ variable "deletion_protection" {
 }
 variable "multi_az" {
   description = "DB high availability"
-  default     = "true"
+  default     = "false"
 }
