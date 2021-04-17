@@ -70,7 +70,7 @@ I have found that when we add new github project in circleci, it ask for **Commi
 ![environment-variable.png](images/environment-variable.png)
 I have added the below variables using Circleci WebUI due to security reasons because some variables contains secret values such as aws access key & access key id, github token which we don't want to show in github repo.
 
-- **GITHUB_TOKEN**: Configure the github token by choosing the option personal access tokens from the github setting -> then developer setting -> Personal access tokens. This token will be used to create the release on the repo.
+- **GITHUB_TOKEN**: Configure the github token by choosing the option personal access tokens from the github setting -> then developer setting -> Personal access tokens. This token will be used to create the release in the repo.
 
 - **app_artifact_bucket**: Choose the unique name of S3 bucket otherwise build stage will fail so make sure this bucket name do not exist before. This bucket will be used to store the build stage artifact.
 
@@ -103,7 +103,7 @@ Successful pipeline will look something like this:
 
 - #### [**build**](#build)
 
-   In the second/build stage ((**build stage**), it downloads the code from the repo <https://github.com/servian/TechChallengeApp.git> then build the code and tag the artifact as per the version defined in cmd/root.go file and finally upload it on the S3 bucket.
+   In the second/build stage ((**build stage**), it downloads the code from the repo <https://github.com/servian/TechChallengeApp.git> then build the code and tag the artifact as per the version defined in cmd/root.go file and finally upload it in the S3 bucket.
 
 - #### [**terraform_deploy**](#terraform_deploy)
 
@@ -1076,15 +1076,15 @@ To access the application from the web browser go to the AWS search bar on the t
 ![App-Response](images/App-Response.png)
 
 This is how the release will look like on the repo:
-![release](images/release.png)
+![release](images/release.PNG)
 
-If we want to create release & pre-release in below format then simply remove the `:${RELEASE_MESSAGE}` from below command `(line number 153 and 156)`.
+If we want to create release & pre-release in below format then simply remove `:${RELEASE_MESSAGE}` from below command `(line number 153 and 156)` in the CircleCI file `.circleci/config.yml`..
 
 ```sh
 ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1}  -delete  -n "v${RELEASE_NUMBER}"  -b "${BODY}"  v${RELEASE_NUMBER}  ./artifacts
 ```
 
-![release2](images/release2.png)
+![release2](images/release2.PNG)
 
 ## **[Blue Green Deployment](#blue-green-deployment)**
 
