@@ -139,7 +139,7 @@ Tier3 is the last tier in the architecture, in this tier database instances resi
 
 ### **Prerequisites for setting up AWS Infrastructure using Terraform**
 
-- Already mentioned in this above section [**prerequisites**](#prerequisites).
+- Already mentioned in the above section [**prerequisites**](#prerequisites).
 
 ### **Terraform Variables**
 
