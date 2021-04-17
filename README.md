@@ -93,53 +93,53 @@ Successful pipeline will look something like this:
 
 ![pipeline-stages.PNG](images/pipeline-stages.PNG)
 
-#### **[CI/CD Stages](#ci/cd-stages)**
+#### **CI/CD Stages**
 
-- #### [**terraform_backend**](#terraform_backend)
+- #### **terraform_backend**
 
      In the first stage of pipeline, it create two S3 bucket as per the environmental variable `app_artifact_bucket` and `terraform_state_bucket`.
 
-- #### [**build**](#build)
+- #### **build**
 
    In the second/build stage ((**build stage**), it downloads the code from the repo <https://github.com/servian/TechChallengeApp.git> then build the code and tag the artifact as per the version defined in cmd/root.go file and finally upload it in the S3 bucket.
 
-- #### [**terraform_deploy**](#terraform_deploy)
+- #### **terraform_deploy**
 
    In the third stage, which is AWS infrastructure deployment stage. It makes the change in the ec2 userdata script, and in other terraform files as per the environment variable and finally it creates the three tier infrastructure on AWS. Detail about each infrastructure component is mentioned in this section [**TechChallengeAPP three tier architecture on AWS**](#techChallengeAPP-three-tier-architecture-on-AWS).
 
-- #### [**app_status**](#app_status)
+- #### **app_status**
 
    In the fourth stage of the pipeline, it perform healthcheck checks on the application load balancer (ALB DNS NAME) endpoint (/healthcheck/) and expect the  OK response. In case of health check failure/unhealthy response, the pipeline will fail and will not proceed to the release stage. To get the endpoint detail we are using terraform show command as mentioned in the script `status.sh` exist under the folder `statebucket`.
 
-- #### [**release**](#release)
+- #### **release**
 
     As mentioned above only after the fourth stage is successful, the last and the fifth stage will be executed. This stage creates a release, pre-release based on the version mentioned in the root.go file.
 
-## [**TechChallengeAPP three tier architecture on AWS**](#techChallengeAPP-three-tier-architecture-on-AWS)
+## **TechChallengeAPP Three Tier Architecture on AWS**
 
   I have used terraform to create the below mentioned three tier infrastructure on AWS.
 
 ![three-tier-architecture.PNG](images/three-tier-architecture.PNG)
 
-### [**Tier 1: Public access - Application Load balancer**](#Tier-1:-public-access---application-load-balancer)
+### **Tier 1: Public access - Application Load balancer**
 
 Tier1 is publicly accessible and it has two subnets(ip address range 10.0.5.0/24 & 10.0.6.0/24) spread across two availability zone (us-east-1a, us-east-1b). Application load balancer (ALB) gets deployed in a public subnet so that end user can access application from internet. To achieve high availability for the application two NAT gateway will also be get deployed in each of these public subnets. Application load balancer listens on a port 80 and forwards the traffic to the backend instances running in tier2 at port 3000. Application load balancer target group configured to perform a health check of backend at port 3000 on the path /healthcheck/.
 
-### [**Tier 2: Restricted access - Multiple App servers in private subnet**](#Tier-2:-restricted-access---multiple-app-servers-in-private-subnet)
+### **Tier 2: Restricted access - Multiple App servers in private subnet**
 
 Tier2 also consists of two private subnets (IP address range 10.0.3.0/24 & 10.0.4.0/24) with a NAT gateway attached to the routes associated with these subnets so that instances running in the private subnet can reach the internet. Application instances running in the private subnets are managed/launched under the autoscaling group. Cloudwatch monitoring enabled and configured for scale Out & scale In of the instance based on CPU metrics. These instances registered themselves under the target group which is attached to the ALB. Application security group ingress rule on the private subnet only allows traffic from the load balancer security group at port 3000.
 
-### [**Tier 3: Restricted access - Database Running in private Subnet**](#Tier-3:-restricted-access---database-running-in-private-subnet)
+### **Tier 3: Restricted access - Database Running in private Subnet**
   
 Tier3 is the last tier in the architecture, in this tier database instances reside and running in a multi-AZ environment. This tier also spread across two availability zone, the master is running in one zone while the standby is running on another zone which will take over in case of primary DB fails. Private subnet range for this tier is 10.0.1.0/24 & 10.0.2.0/24. DB Security group ingress rule only allows traffic from the application security group at port 5432.
 
-# **[Detail description of the Terraform code in the Three-Tier AWS architecture](#Detail-description-of-the-Terraform-code-in-the-Three---Tier-AWS-architecture)**
+# **Detail description of the Terraform code in the Three-Tier AWS architecture**
 
-### **[Prerequisites for setting up AWS Infrastructure using Terraform](#prerequisites-for-setting-up-aws-infrastructure-using-terraform)**
+### **Prerequisites for setting up AWS Infrastructure using Terraform**
 
 - Already mentioned in this above section [**prerequisites**](#prerequisites).
 
-### **[Terraform Variables](#terraform-variables)**
+### **Terraform Variables**
 
 Terraform variable file located under the folder app/deploy/variables.tf and following is detailed description of each variable. Most of the variables are self explanatory.
 
@@ -170,7 +170,7 @@ Terraform variable file located under the folder app/deploy/variables.tf and fol
 - `deletion_protection`: Deletion protection, for production set it to true
 - `multi_az`: RDS instance deployed with multi-AZ option provide high availability
 
-### **[Terraform State File](#terraform-state-file)**
+### **Terraform State File**
 
 Terraform state file will be stored in the S3 bucket (`as per the circleci project environment variable -> terraform_state_bucket`) which will be created during the first stage (`terraform_backend`) of the pipeline. This state file will be used in later stage (`app_status`) to check the ALB dns name to perform healtheck of the endpoint (/healthcheck/) also it is good practice to store state file outside local environment such as S3, dynamodb, consul etc.
 
@@ -185,7 +185,7 @@ terraform {
 }
 ```
 
-### **[Create a provider for AWS](#create-a-provider-for-aws)**
+### **Create a provider for AWS**
 
 Provider file (`provider.tf`) exist under the path on the repo servian/app/deploy. AWS region value will be updated as per the value set in variable.tf.
 
@@ -195,7 +195,7 @@ provider "aws" {
 }
 ```
 
-### **[Create a VPC and Internet Gateway](#create-a-vpc-and-internet-gateway)**
+### **Create a VPC and Internet Gateway**
 
 To build the whole infrastructure for the application, first, we need to create the VPC. Here we will create a VPC with the CIDR range of 10.0.0.0/16. Then create the internet gateway which provides connectivity to the internet and attached it to the vpc. Set the DNS option as default to `AmazonProvidedDNS` which is provided AWS but it can be configured to custom DNS value as well and finally associate it to vpc.
 
@@ -235,7 +235,7 @@ resource "aws_vpc_dhcp_options_association" "dns_resolver" {
 }
 ```
 
-### **[Create a Public Subnet, Internet Gateway and Security Group](#create-a-public-subnet,-internet-gateway-and-security-group)**
+### **Create a Public Subnet, Internet Gateway and Security Group**
 
 In the VPC, Tier1 has two public subnets (`pub_subnet_1 (10.0.5.0/24), pub_subnet_2 (10.0.6.0/24)`) as mentioned in the above AWS architect diagram and both these subnets has access to internet via internet gateway. Let discuss in detail each of these resource and how it is been associated with each other. As the application load balancer will be launched in the public subnet we are using security group to allow traffic at port 80 from outside world.
 
@@ -325,7 +325,7 @@ resource "aws_security_group" "lb_asg" {
 }
 ```
 
-### **[Create a Private Subnet, Nat Gateway, Security Group for Application](#Create-a-private-subnet,-nat-gateway,-security-group-for-application)**
+### **Create a Private Subnet, Nat Gateway, Security Group for Application**
 
 In the Application Tier (Tier2) we are also going to create two private subnets (`app_subnet_1 (10.0.3.0/24), app_subnet_2 (10.0.4.0/24)`) in the two availability zones and both these subnets has NAT Gateway attached to it so that the instances can reach the internet. In order to provide the restricted access to this tier only traffic from the load balancer security group at port 3000 is allowed.
 
@@ -477,7 +477,7 @@ resource "aws_security_group_rule" "app_lb_ingress_rule" {
 }
 ```
 
-### **[Create a Private Subnet, Security Group for RDS and launch it in multi AZ](#create-a-private-subnet-security-group-for-rds-and-launch-it-in-multi-az)**
+### **Create a Private Subnet, Security Group for RDS and launch it in multi AZ**
 
 In the database Tier (Tier3), again we are going to create two private subnets (In two availability zones ) (`db_subnet_1 (10.0.1.0/24, db_subnet_2 (10.0.2.0/24)`) for RDS database but with no access to internet and can only be accessible from application security group (`APP SG`) at port 5432. Following is the detail of the resources terraform will create as per the below .tf file.
 
@@ -574,7 +574,7 @@ resource "aws_security_group_rule" "db_app_ingress_rule" {
 }
 ```
 
-### **[Create IAM Role and Policies](#create-iam-role-and-policies)**
+### **Create IAM Role and Policies**
 
 We need to create IAM profile, IAM role, IAM policies and attached it to the launch config so that instance can fetch value from SSM parameter store, download artifacts from S3 buckets.
 
@@ -672,7 +672,7 @@ resource "aws_iam_role_policy_attachment" "cw_db_policy_attach" {
 }
 ```
 
-### **[Userdata Script](#userdata-script)**
+### **Userdata Script**
 
 Userdata script (`userdata-asg.sh`) is used to download, install the artifact for app from S3 bucket and then run it inside the instance. It will also install cloudwatch agent and fetch the values from SSM parameter store and then setting up the environmental variable for application.
 
@@ -709,7 +709,7 @@ cd dist
 ./TechChallengeApp updatedb -s;./TechChallengeApp serve
 ```
 
-### **[Create and Store Encrypted Secrets in SSM Parameter Store](#create-and-store-encrypted-secrets-in-ssm-parameter-store)**
+### **Create and Store Encrypted Secrets in SSM Parameter Store**
 
 RDS database password will be created using `random_password` terraform resource, similarly, other database resources such as (`db_username, db_password, db_name, db_hostname`) will be created and stored in the SSM parameter store. Later in the pipeline stage (**terraform_deploy**) these SSM parameter store values will be fetched by ec2 instance using `userdata-asg.sh` script. And all these parameters are encrypted using the default KMS key provided by AWS.
 
@@ -781,7 +781,7 @@ SSM Parameter Store Values
 
 ![parameter_store_value.png](images/parameter_store_value.png)
 
-### **[Launch Application Servers using AWS Launch Config and Auto Scaling Group](#launch-application-servers-using-aws-launch-config-and-auto-scaling-group)**
+### **Launch Application Servers using AWS Launch Config and Auto Scaling Group**
 
 This section describes how the application gets deployed on EC2 instances managed by autoscaling group. To deploy the application we are using launch configuration along with autoscaling group which scale In or Out instances based on high resource utilization such as CPU. Resource utilization is monitored by Cloudwatch and triggered an alert in case of metrics reach the threshold limit. Instances get the database values such as **(VTT_DBUSER, VTT_DBPASSWORD etc..)** from the SSM parameter store from the userdata script and it establishes the connection with multi-AZ RDS instance. EC2 instance need to pass the healthcheck at endpoint /heathcheck/ in order to pass the initial health check and register themselves under the Target Group . Application load balancer will send the traffic to the healthy targets. Below is a detailed description of how to configure the launch configuration and autoscaling group.
 
@@ -866,7 +866,7 @@ cd dist
 ./TechChallengeApp updatedb -s;./TechChallengeApp serve
 ```
 
-### **[Create Cloudwatch Alarm and Autoscaling Group Policies](#create-cloudwatch-alarm-and-autoscaling-group-policies)**
+### **Create Cloudwatch Alarm and Autoscaling Group Policies**
 
 In order to scale up and scale down autoscaling group we need to setup autoscaling policies and respective alarms. Auto-scaling policy action (up/down) controlled by the cloudwatch alarm. To keep things simple i have ONLY used CPU metrics to trigger alarms for autoscaling of ec2 instance. By default AWS do not provide metrics for Memory and to set it up we are going to install cloudwatch agent and configure it by downloading the config file located on link <https://raw.githubusercontent.com/rsthakur83/servian/circleci-project-setup/CloudWatchAgentConfig.json>. Cloudwatch agent installation part is taken care by userdata script `userdata-asg.sh`.
 
@@ -999,7 +999,7 @@ resource "aws_autoscaling_policy" "agents-scale-down-mem" {
 }
 ```
 
-### **[Create Application Load Balancer, Listener and Target group](#create-application-load-balancer,-listener-and-target-group)**
+### **Create Application Load Balancer, Listener and Target group**
 
 To access the application from internet we are going to create application load balancer and need to register the EC2 instances under Target group. Once the instances registered and passes the health checks, application should be accessible via ALB dns name and should be able to forward all incoming requests at port 80 to backend instances on port 3000
 
@@ -1058,7 +1058,7 @@ resource "aws_lb_listener" "app-alb-Listener" {
 }
 ```
 
-### **[Access Servian App and Tag Release](#access-servian-app-and-tag-release)**
+### **Access Servian App and Tag Release**
 
 Once the circleci pipeline completes the first three stages we will have all the three tiers of infrastructure gets deployed on AWS. In the fourth stage (`app_status`) it performs the health check of ALB endpoint **(ALB DNS Name)** on the path /healthcheck/ as mentioned in the below example and only after getting the `OK` response the next stage and final stage (`release`) get triggered. In the fifth and final stage, it will create a release & tag it as per the version mentioned in the root.go file and last commit message.
 
@@ -1084,7 +1084,7 @@ ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAM
 
 ![release2](images/release2.PNG)
 
-## **[Blue Green Deployment](#blue-green-deployment)**
+## **Blue Green Deployment**
 
 CircleCI pipeline gets triggered every time we have commit in the repo <https://github.com/servian/TechChallengeApp.git> master branch and the latest changes get deployed. Basically we are creating the new launch config APP-LC-2 and swap it with existing (first time created LC APP-LC). During this process of new lauch configuration following things happens:
 
