@@ -1088,7 +1088,7 @@ ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAM
 
 ## **[Blue Green Deployment](#blue-green-deployment)**
 
-Circleci pipeline is configured in such a way that everytime it gets triggered it will deploy the latest commit on the TechChallengeAPP master branch. Basically we are creating the new launch config APP-LC-2 and swap it with existing (first time created LC APP-LC). During this process of new lauch configuration following things happens:
+CircleCI pipeline gets triggered every time we have commit in the repo <https://github.com/servian/TechChallengeApp.git> master branch and the latest changes get deployed. Basically we are creating the new launch config APP-LC-2 and swap it with existing (first time created LC APP-LC). During this process of new lauch configuration following things happens:
 
 - During build stage we are creating the new artifact based on version mentioned in root.go file and upload it in S3 artifact bucket
 - In the third stage (terraform_deploy) `userdata-asg.sh` script will download the respective version (as per root.go version) from S3 artifact bucket and install on the ec2 instance
