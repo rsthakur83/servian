@@ -61,7 +61,7 @@ This section explains the prerequisite of setting up ci/cd pipeline using circle
 
 I have found that when we add new github project in circleci, it ask for **Commit and Run** on the newly added github project. Because we have not set all the environmental variable yet for the project so i recommend here that trigger the build by choosing (`Commit and run`) then cancel it at the same time then go to the project again to set all the environmental variables mentioned in the below section.
   
-## b)
+#### b)
 
  One more important thing, if you want to deploy resources in any other AWS region than **us-east-1** then change these four values (`aws_region, az_zone_1, az_zone_2, image_id`) in `variables.tf` located under the folder `servian/app/deploy`.
 
