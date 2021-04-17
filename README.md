@@ -1096,7 +1096,7 @@ CircleCI pipeline gets triggered every time we have commit in the repo <https://
 - And finally after the ALB endpoint pass the healthcheck in the fourth stage (app_status), new release will be created on the github repo as per the latest commit message & tag (root.go) on TechChallengeApp repo.
 - If we re-run the circleci pipeline again the same process will repeat again but this time APP-LC-2 will be replaced by new lauch config (APP-LC)
 
-Here is the script (`deploy.sh`) which is doing the blue-green deployment magic!!!! and three tier infra deployment on AWS.
+Here is the script (located under the path `app/deploy.sh`) which is doing the blue-green deployment magic!!!! and three tier infra deployment on AWS.
 
 ```sh
 #!/bin/bash
