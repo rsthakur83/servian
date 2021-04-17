@@ -36,7 +36,7 @@
     - **[Create Cloudwatch Alarm and Autoscaling group policies](#create-cloudwatch-alarm-and-autoscaling-group-policies)**
     - **[Create application load balancer, Listener and Target group](#create-application-load-balancer,-listener-and-target-group)**
   
-  - **[Access Servian App and Tag Release](#access-servian-app-and-tag-release)**
+  - **[Access Servian App and Tag the Release](#access-servian-app-and-tag-the-release)**
   - **[Blue Green Deployment](#blue-green-deployment)**
 
 ## **Circle CI/CD pipeline**
@@ -1058,7 +1058,7 @@ resource "aws_lb_listener" "app-alb-Listener" {
 }
 ```
 
-### **Access Servian App and Tag Release**
+### **Access Servian App and Tag the Release**
 
 Once the circleci pipeline completes the first three stages we will have all the three tiers of infrastructure gets deployed on AWS. In the fourth stage (`app_status`) it performs the health check of ALB endpoint **(ALB DNS Name)** on the path /healthcheck/ as mentioned in the below example and only after getting the `OK` response the next stage and final stage (`release`) get triggered. In the fifth and final stage, it will create a release & tag it as per the version mentioned in the root.go file and last commit message.
 
