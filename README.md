@@ -1,6 +1,6 @@
 # A step-by-step tutorial to deploy Servian TechChallenge App using Circle CI **on AWS EC2 Instances**.
 
-**I have tested this setup on AWS region `us-east-1` and also the terraform variable.tf file has values set as per the rgion `us-east-1` so i recommend to use the same region. If you want to test and deploy the resources in any other region then it requires changes mentioned here --> [**b**](#b)**.
+**I have tested this setup on AWS region `us-east-1` and also the terraform variable.tf file has values set as per the region `us-east-1` so i recommend to use the same region. If you want to test and deploy the resources in any other region then it requires changes mentioned here --> [**b**](#b)**.
 
 - [Table of Contents](#table-of-contents)
   - [**Circle CI/CD pipeline**](#circle-cicd-pipeline)
