@@ -16,9 +16,9 @@
   - [**TechChallengeAPP three tier architecture on AWS**](#techChallengeAPP-three-tier-architecture-on-AWS)
 
     Let’s go through each of the tiers:
-    - [**Tier 1: Public access - Application Load balancer**](#Tier-1:-public-access---application-load-balancer)
-    - [**Tier 2: Restricted access - Multiple App servers in private subnet**](#Tier-2:-restricted-access---multiple-app-servers-in-private-subnet)
-    - [**Tier 3: Restricted access - Database Running in private Subnet**](#Tier-3:-restricted-access---database-running-in-private-subnet)
+    - [**Tier 1: Public access - Application Load balancer**](#tier-1-public-access---application-load-balancer)
+    - [**Tier 2: Restricted access - Multiple App servers in private subnet**](#tier-2-restricted-access---multiple-app-servers-in-private-subnet)
+    - [**Tier 3: Restricted access - Database Running in private Subnet**](#tier-3-restricted-access---database-running-in-private-subnet)
 
   - **[Detail description of the Terraform code in the Three-Tier AWS architecture](#Detail-description-of-the-Terraform-code-in-the-Three-Tier-AWS-architecture)**
     - **[Prerequisites for setting up AWS Infrastructure using terraform](#prerequisites-for-setting-up-aws-infrastructure-using-terraform)**
