@@ -16,8 +16,7 @@
   - [**TechChallengeAPP three tier architecture on AWS**](#techChallengeAPP-three-tier-architecture-on-AWS)
 
     Let’s go through each of the tiers:
-    - [**Tier 1: Public access - Application Load balancer**](#Tier-1:-public-access---application-load-balancer)
-    - [**Tier 1: Public access - Application Load balancer**](#Tier-1:-public-access---application-load-balancer)
+    - [**Tier 1: Public access - Application Load balancer**](#tier-1:-public-access---application-load-balancer)
     - [**Tier 2: Restricted access - Multiple App servers in private subnet**](#Tier-2:-restricted-access---multiple-app-servers-in-private-subnet)
     - [**Tier 3: Restricted access - Database Running in private Subnet**](#Tier-3:-restricted-access---database-running-in-private-subnet)
 
