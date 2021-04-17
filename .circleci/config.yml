@@ -173,3 +173,7 @@ workflows:
       - release:
          requires:
             - app_status
+        filters:
+          branches:
+            only:
+              - master              
