@@ -1071,7 +1071,7 @@ To access the application from the web browser go to the AWS search bar on the t
 
 ![ALB-Endpoint.PNG](images/ALB-Endpoint.PNG)
 
-![App-Response](images/App-Response.png)
+![App-Response](images/App-Response.PNG)
 
 This is how the release will look like on the repo:
 ![release](images/release.PNG)
