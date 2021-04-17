@@ -13,7 +13,7 @@
       - [app_status](#app_status)
       - [release](#release)
 
-  - [**TechChallengeAPP three tier architecture on AWS**](#techChallengeAPP-three-tier-architecture-on-AWS)
+  - [**TechChallengeAPP Three Tier Architecture on AWS**](#techChallengeAPP-three-tier-architecture-on-AWS)
 
     Let’s go through each of the tiers:
     - [**Tier 1: Public access - Application Load balancer**](#tier-1-public-access---application-load-balancer)
