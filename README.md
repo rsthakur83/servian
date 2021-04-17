@@ -41,7 +41,7 @@
 
 ## **Circle CI/CD pipeline**
 
-This section explains the prerequisite of setting up ci/cd pipeline using circleci for TechchallengeApp on AWS EC2 Instance.
+This section explains the prerequisite of setting up ci/cd pipeline using circleci for TechchallengeApp running on AWS EC2 Instance.
 
 ## **Prerequisites**
 
