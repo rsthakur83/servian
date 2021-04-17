@@ -23,7 +23,7 @@ resource "aws_db_instance" "app_db" {
   engine_version                  = var.db_engine_version
   db_subnet_group_name            = aws_db_subnet_group.db_subnet.name
   vpc_security_group_ids          = [aws_security_group.db.id]
-//  storage_encrypted               = var.storage_encrypted
+  storage_encrypted               = var.storage_encrypted
   maintenance_window              = var.maintenance_window
   backup_window                   = var.backup_window
   enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
