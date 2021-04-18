@@ -28,15 +28,15 @@ This step-by-step tutorial explains how to deploy Servian TechChallenge App usin
     - **[Terraform State file](#terraform-state-file)**
     - **[Create a Provider for AWS](#create-a-provider-for-aws)**
     - **[Create a VPC and Internet Gateway](#create-a-vpc-and-internet-gateway)**
-    - **[Create a Public Subnet, Internet Gateway and Security Group](#create-a-public-subnet,-internet-gateway-and-security-group)**
-    - **[Create a Private Subnet, Nat Gateway, Security Group for Application](#Create-a-private-subnet,-nat-gateway,-security-group-for-application)**
-    - **[Create a Private Subnet, Security Group for RDS and launch it in multi AZ](#create-a-private-subnet-security-group-for-rds-and-launch-it-in-multi-az)**
+    - **[Create a Public Subnet, Internet Gateway and Security Group](#create-a-public-subnet-internet-gateway-and-security-group)**
+    - **[Create a Private Subnet, Nat Gateway, Security Group for Application](#Create-a-private-subnet-nat-gateway-security-group-for-application)**
+    - **[Create a Private Subnet, Security Group for RDS and launch it in Multi AZ](#create-a-private-subnet-security-group-for-rds-and-launch-it-in-multi-az)**
     - **[Create IAM role and policies](#create-iam-role-and-policies)**
     - **[Userdata script](#userdata-script)**
     - **[Create and store encrypted secrets in SSM parameter store](#create-and-store-encrypted-secrets-in-ssm-parameter-store)**
     - **[Launch Application servers using AWS launch config and auto scaling group](#launch-application-servers-using-aws-launch-config-and-auto-scaling-group)**
     - **[Create Cloudwatch Alarm and Autoscaling group policies](#create-cloudwatch-alarm-and-autoscaling-group-policies)**
-    - **[Create application load balancer, Listener and Target group](#create-application-load-balancer,-listener-and-target-group)**
+    - **[Create application load balancer, Listener and Target group](#create-application-load-balancer-listener-and-target-group)**
   
   - **[Access Servian App and Tag the Release](#access-servian-app-and-tag-the-release)**
   - **[Blue Green Deployment](#blue-green-deployment)**
