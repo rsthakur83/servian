@@ -76,9 +76,9 @@ I have added the below variables using Circleci WebUI due to security reasons be
 
 - **app_repo**: Set this variable value as (TechCallengeApp repo link)  <https://github.com/servian/TechChallengeApp.git>. It will be used in the ec2 userdata script, build and release stage.
 
-- **aws_access_key_id**: Set the AWS access key
+- **aws_access_key_id**: Set the AWS access key id
   
-- **aws_secret_access_key**: Set the AWS secret key
+- **aws_secret_access_key**: Set the AWS secret access key id
   
 - [**aws_region**](#aws-_-region): Set the AWS region (for example us-east-1) where you want to deploy the app, other AWS resources.
 
