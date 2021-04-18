@@ -48,7 +48,7 @@ This section explains the prerequisite of setting up ci/cd pipeline using circle
 ## **Prerequisites**
 
 - First, create a new repository on your github account.
-- Secondly, clone/copy the repository using below command on the above newly created blank repository.
+- Secondly, clone the repository using below command on the above newly created blank repository.
 ```sh
 git clone https://github.com/rsthakur83/TechChallengeApp-EC2.git
 ```
