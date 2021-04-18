@@ -83,7 +83,7 @@ I have added the below variables using Circleci WebUI due to security reasons be
 - [**aws_region**](#aws-_-region): Set the AWS region (for example us-east-1) where you want to deploy the app, other AWS resources.
 
 - **terraform_state_bucket**: Again choose the unique S3 bucket name. This bucket will be used to store the terraform state file.
-- **image_ami_id**: AMI image id of ec2 instance as per the AWS region for us-east-1 set it as **ami-042e8287309f5df03**  this is the current defaul value set in `variables.tf` file.
+- **image_ami_id**: AMI image id of ec2 instance as per the AWS region, for us-east-1 set it as **ami-042e8287309f5df03**  this is the current defaul value set in `variables.tf` file.
 
 After github repo integrated with circleci and environmental variable configured. Now its time to trigger the pipeline, to start the pipeline click on the rerun workflow from start option on the right side of the pipeline as highlighted in this diagram.
 
