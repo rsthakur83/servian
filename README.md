@@ -22,7 +22,7 @@ This step-by-step tutorial explains how to deploy Servian TechChallenge App usin
     - [**Tier 2: Restricted access - App Servers in private subnet**](#tier-2-restricted-access---app-servers-in-private-subnet)
     - [**Tier 3: Restricted access - Database Running in private Subnet**](#tier-3-restricted-access---database-running-in-private-subnet)
 
-  - **[Detail description of the Terraform code in the Three-Tier AWS architecture](#Detail-description-of-the-Terraform-code-in-the-Three-Tier-AWS-architecture)**
+  - **[Detail description of the Terraform code in the Three-Tier AWS Architecture](#Detail-description-of-the-Terraform-code-in-the-Three-Tier-AWS-architecture)**
     - **[Prerequisites for setting up AWS Infrastructure using terraform](#prerequisites-for-setting-up-aws-infrastructure-using-terraform)**
     - **[Terraform Variables](#terraform-variables)**
     - **[Terraform State file](#terraform-state-file)**
@@ -135,7 +135,7 @@ Tier2 also consists of two private subnets (IP address range 10.0.3.0/24 & 10.0.
   
 Tier3 is the last tier in the architecture, in this tier database instances reside and running in a multi-AZ environment. This tier also spread across two availability zone, the master is running in one zone while the standby is running on another zone which will take over in case of primary DB fails. Private subnet range for this tier is 10.0.1.0/24 & 10.0.2.0/24. DB Security group ingress rule only allows traffic from the application security group at port 5432.
 
-# **Detail description of the Terraform code in the Three-Tier AWS architecture**
+# **Detail description of the Terraform code in the Three-Tier AWS Architecture**
 
 ### **Prerequisites for setting up AWS Infrastructure using Terraform**
 
