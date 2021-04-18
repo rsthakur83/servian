@@ -48,7 +48,10 @@ This section explains the prerequisite of setting up ci/cd pipeline using circle
 ## **Prerequisites**
 
 - First, create a new repository on your github account
-- Secondly, clone/copy the repository <> on the above newly created blank repository.
+- Secondly, clone/copy the repository using below command on the above newly created blank repository.
+```sh
+git clone https://github.com/rsthakur83/TechChallengeApp-EC2.git
+```
 - Third, create a free circleci account, integrate it with your GitHub account to give permission/allow the access onto the newly created github repo. Once the github account integrated with circleci, and has required permission, click on set up project button as mentioned in following diagram so that build can be trigger from circleci. There are two option you will see after github authorized to/integrate with circle CI as highlighted below. One is the setup project this one we need to select to add github repo to circleci while other (`Unfollow Project`) shows already integrated project in CircleCI.
 ![circle-ci-github-integration](images/circle-ci-github-integration.PNG)
 - After circleci project ready, go to the project and click on project setting option on the top right side and choose environment variables option to set all **eight environmental variables** in the project mentioned in the below diagram.
