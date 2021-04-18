@@ -19,7 +19,7 @@ This step-by-step tutorial explains how to deploy Servian TechChallenge App usin
 
     Let’s go through each of the tiers:
     - [**Tier 1: Public access - Application Load balancer**](#tier-1-public-access---application-load-balancer)
-    - [**Tier 2: Restricted access - Multiple App servers in private subnet**](#tier-2-restricted-access---multiple-app-servers-in-private-subnet)
+    - [**Tier 2: Restricted access - App servers in private subnet**](#tier-2-restricted-access---app-servers-in-private-subnet)
     - [**Tier 3: Restricted access - Database Running in private Subnet**](#tier-3-restricted-access---database-running-in-private-subnet)
 
   - **[Detail description of the Terraform code in the Three-Tier AWS architecture](#Detail-description-of-the-Terraform-code-in-the-Three-Tier-AWS-architecture)**
@@ -127,7 +127,7 @@ Successful pipeline will look something like this:
 
 Tier1 is publicly accessible and it has two subnets(ip address range 10.0.5.0/24 & 10.0.6.0/24) spread across two availability zone (us-east-1a, us-east-1b). Application load balancer (ALB) gets deployed in a public subnet so that end user can access application from internet. To achieve high availability for the application two NAT gateway will also be get deployed in each of these public subnets. Application load balancer listens on a port 80 and forwards the traffic to the backend instances running in tier2 at port 3000. Application load balancer target group configured to perform a health check of backend at port 3000 on the path /healthcheck/.
 
-### **Tier 2: Restricted access - Multiple App servers in private subnet**
+### **Tier 2: Restricted access - App servers in private subnet**
 
 Tier2 also consists of two private subnets (IP address range 10.0.3.0/24 & 10.0.4.0/24) with a NAT gateway attached to the routes associated with these subnets so that instances running in the private subnet can reach the internet. Application instances running in the private subnets are managed/launched under the autoscaling group. Cloudwatch monitoring enabled and configured for scale Out & scale In of the instance based on CPU metrics. These instances registered themselves under the target group which is attached to the ALB. Application security group ingress rule on the private subnet only allows traffic from the load balancer security group at port 3000.
 
