@@ -202,9 +202,9 @@ provider "aws" {
 To build the whole infrastructure for the application, first, we need to create the VPC. Here we will create a VPC with the CIDR range of 10.0.0.0/16. Then create the internet gateway which provides connectivity to the internet and attached it to the vpc. Set the DNS option as default to `AmazonProvidedDNS` which is provided AWS but it can be configured to custom DNS value as well and finally associate it to vpc.
 
 
-**`aws_vpc.app_vpc`**: This resouces will create vpc and we just configured the CIDR range and enabled dns.
-**`aws_internet_gateway.app_igw`:** Defines an internet gateway to be used by the public subnet and the NAT for the private subnets.
-**`aws_vpc_dhcp_options.dns_resolver and aws_vpc_dhcp_options_association.dns_resolver`:** Defines the DNS server for our VPC. We will use the amazon provided DNS for simplicity but you can add any other DNS ip here. Finally we associate the DNS configuration with our app_vpc resource.
+- **`aws_vpc.app_vpc`**: This resouces will create vpc and we just configured the CIDR range and enabled dns.
+- **`aws_internet_gateway.app_igw`:** Defines an internet gateway to be used by the public subnet and the NAT for the private subnets.
+- **`aws_vpc_dhcp_options.dns_resolver and aws_vpc_dhcp_options_association.dns_resolver`:** Defines the DNS server for our VPC. We will use the amazon provided DNS for simplicity but you can add any other DNS ip here. Finally we associate the DNS configuration with our app_vpc resource.
 
 ```sh
 # VPC
@@ -241,12 +241,12 @@ resource "aws_vpc_dhcp_options_association" "dns_resolver" {
 
 In the VPC, Tier1 has two public subnets (`pub_subnet_1 (10.0.5.0/24), pub_subnet_2 (10.0.6.0/24)`) as mentioned in the above AWS architect diagram and both these subnets has access to internet via internet gateway. Let discuss in detail each of these resource and how it is been associated with each other. As the application load balancer will be launched in the public subnet we are using security group to allow traffic at port 80 from outside world.
 
-`aws_subnet.pub_subnet_1`: This resource will create public subnet1 (IP address range 10.0.5.0/24) in availability zone us-east-1a
-`aws_subnet.pub_subnet_2`: This resource will create public subnet2 (IP address range 10.0.6.0/24) in availability zone us-east-1b
-`aws_route_table.public-routes`: This resource will create public routes which has internet gateway attached to it
-`aws_route_table_association.public-subnet-routes-1`: This resource will associate the above created routing table (public-routes) with the subnet 1
-`aws_route_table_association.public-subnet-routes-2`:This resource will associate the above created routing table (public-routes) with the subnet 2
-`aws_security_group.lb_asg`: This resource create the security group which allow only traffic at port 80 of the applicaiton load balancer from the internet
+- `aws_subnet.pub_subnet_1`: This resource will create public subnet1 (IP address range 10.0.5.0/24) in availability zone us-east-1a
+- `aws_subnet.pub_subnet_2`: This resource will create public subnet2 (IP address range 10.0.6.0/24) in availability zone us-east-1b
+- `aws_route_table.public-routes`: This resource will create public routes which has internet gateway attached to it
+- `aws_route_table_association.public-subnet-routes-1`: This resource will associate the above created routing table (public-routes) with the subnet 1
+- `aws_route_table_association.public-subnet-routes-2`:This resource will associate the above created routing table (public-routes) with the subnet 2
+- `aws_security_group.lb_asg`: This resource create the security group which allow only traffic at port 80 of the applicaiton load balancer from the internet
 
 ```sh
 # Public Subnet Groups required by load balancer
@@ -331,27 +331,18 @@ resource "aws_security_group" "lb_asg" {
 
 In the Application Tier (Tier2) we are also going to create two private subnets (`app_subnet_1 (10.0.3.0/24), app_subnet_2 (10.0.4.0/24)`) in the two availability zones and both these subnets has NAT Gateway attached to it so that the instances can reach the internet. In order to provide the restricted access to this tier only traffic from the load balancer security group at port 3000 is allowed.
 
-`aws_subnet.app_subnet_1`: This resource will create public subnet1 (IP address range 10.0.3.0/24) in availability zone us-east-1a
-`aws_subnet.app_subnet_2`: This resource will create public subnet1 (IP address range 10.0.4.0/24) in availability zone us-east-1b
-`aws_eip.nat-eip`: This resources create the Elastic ip address required by NAT Gateway
-
-`aws_eip.nat-eip-2`: This resources create the Elastic ip address required by the second NAT Gateway
-
-`aws_nat_gateway.nat-gw`: This resources created the NAT Gateway
-
-`aws_nat_gateway.nat-gw1`: This resources created the second NAT Gateway
-
-`aws_route_table.app-subnet-routes`: This resource will create the route table which has 1st NAT gateway attached to it
-
-`aws_route_table.app-subnet-routes-2`: This resource will create the second route table which has 2nd NAT gateway attached to it
-
-`aws_route_table_association.app-subnet1-routes`: This resource will associate the route table created in previous step to app_subnet_1
-
-`aws_route_table_association" "app-subnet2-routes`: This resource will associate the route table created in previous step to app_subnet_2
-
-`aws_security_group.app_asg`: This resource will create application security group (APP SG)
-
-`aws_security_group_rule.app_lb_ingress_rule`: This resource will create the ingress rule for app_asg security group to allow traffic only from load balancer security group (lb_asg) at port 3000
+- `aws_subnet.app_subnet_1`: This resource will create public subnet1 (IP address range 10.0.3.0/24) in availability zone us-east-1a
+- `aws_subnet.app_subnet_2`: This resource will create public subnet1 (IP address range 10.0.4.0/24) in availability zone us-east-1b
+- `aws_eip.nat-eip`: This resources create the Elastic ip address required by NAT Gateway
+- `aws_eip.nat-eip-2`: This resources create the Elastic ip address required by the second NAT Gateway
+- `aws_nat_gateway.nat-gw`: This resources created the NAT Gateway
+- `aws_nat_gateway.nat-gw1`: This resources created the second NAT Gateway
+- `aws_route_table.app-subnet-routes`: This resource will create the route table which has 1st NAT gateway attached to it
+- `aws_route_table.app-subnet-routes-2`: This resource will create the second route table which has 2nd NAT gateway attached to it
+- `aws_route_table_association.app-subnet1-routes`: This resource will associate the route table created in previous step to app_subnet_1
+- `aws_route_table_association" "app-subnet2-routes`: This resource will associate the route table created in previous step to app_subnet_2
+- `aws_security_group.app_asg`: This resource will create application security group (APP SG)
+- `aws_security_group_rule.app_lb_ingress_rule`: This resource will create the ingress rule for app_asg security group to allow traffic only from load balancer security group (lb_asg) at port 3000
 
 ```sh
 #Provision APP Subnet
@@ -483,10 +474,10 @@ resource "aws_security_group_rule" "app_lb_ingress_rule" {
 
 In the database Tier (Tier3), again we are going to create two private subnets (In two availability zones ) (`db_subnet_1 (10.0.1.0/24, db_subnet_2 (10.0.2.0/24)`) for RDS database but with no access to internet and can only be accessible from application security group (`APP SG`) at port 5432. Following is the detail of the resources terraform will create as per the below .tf file.
 
-`aws_subnet.db_subnet_1`: This resource will create public subnet1 (IP address range 10.0.1.0/24) in availability zone us-east-1a
-`aws_subnet.db_subnet_2`: This resource will create public subnet1 (IP address range 10.0.2.0/24) in availability zone us-east-1b
-`aws_db_subnet_group.db_subnet`: This resource will create subnet group is required during the lauch of RDS instance, and RDS instance will be launched in these private subnets. As we are deploying multi AZ RDS instance so in this case primary instance will be in one az while the standy will get deployed in other az .
-`aws_security_group.db`: This resource will only allow connectivity from application security group (app_asg) at port 5432
+- `aws_subnet.db_subnet_1`: This resource will create public subnet1 (IP address range 10.0.1.0/24) in availability zone us-east-1a
+- `aws_subnet.db_subnet_2`: This resource will create public subnet1 (IP address range 10.0.2.0/24) in availability zone us-east-1b
+- `aws_db_subnet_group.db_subnet`: This resource will create subnet group is required during the lauch of RDS instance, and RDS instance will be launched in these private subnets. As we are deploying multi AZ RDS instance so in this case primary instance will be in one az while the standy will get deployed in other az .
+- `aws_security_group.db`: This resource will only allow connectivity from application security group (app_asg) at port 5432
 
 ```sh
 ###### Provision RDS Postgres Database
@@ -580,10 +571,10 @@ resource "aws_security_group_rule" "db_app_ingress_rule" {
 
 We need to create IAM profile, IAM role, IAM policies and attached it to the launch config so that instance can fetch value from SSM parameter store, download artifacts from S3 buckets.
 
-`aws_iam_instance_profile.cwdb_iam_profile`: This resource will create iam profile and assigned it the role `cwdbrole`
-`aws_iam_role.cwdbrole`: This resource will create iam role
-`aws_iam_policy.policy`: This resource will create iam policy
-`aws_iam_role_policy_attachment.cw_db_policy_attach`: This resource will attach the iam policy arn with cwdbrole.
+- `aws_iam_instance_profile.cwdb_iam_profile`: This resource will create iam profile and assigned it the role `cwdbrole`
+- `aws_iam_role.cwdbrole`: This resource will create iam role
+- `aws_iam_policy.policy`: This resource will create iam policy
+- `aws_iam_role_policy_attachment.cw_db_policy_attach`: This resource will attach the iam policy arn with cwdbrole.
 
 ```sh
 ## IAM profile for instance
@@ -715,11 +706,11 @@ cd dist
 
 RDS database password will be created using `random_password` terraform resource, similarly, other database resources such as (`db_username, db_password, db_name, db_hostname`) will be created and stored in the SSM parameter store. Later in the pipeline stage (**terraform_deploy**) these SSM parameter store values will be fetched by ec2 instance using `userdata-asg.sh` script. And all these parameters are encrypted using the default KMS key provided by AWS.
 
-`random_password.password`|: This resources will create random password of 16 character length for database which consist of number, alphanumerics, special characters.
-`aws_ssm_parameter.db_username`: This resource will create key value in ssm parameter (`dbusername`) which is the database username
-`aws_ssm_parameter.db_password`: This resource will create key value in ssm parameter (`dbpassword` )which has database password and it has value of random_password.password.result
-`aws_ssm_parameter.db_name`: This resource will create ssm parameter (`dbname`) which is database name
-`aws_ssm_parameter.db_hostname`: This resource will create key value in ssm parameter (`dbhostname`) which has value of database endpoint address that application will use to connect
+- `random_password.password`|: This resources will create random password of 16 character length for database which consist of number, alphanumerics, special characters.
+- `aws_ssm_parameter.db_username`: This resource will create key value in ssm parameter (`dbusername`) which is the database username
+- `aws_ssm_parameter.db_password`: This resource will create key value in ssm parameter (`dbpassword` )which has database password and it has value of random_password.password.result
+- `aws_ssm_parameter.db_name`: This resource will create ssm parameter (`dbname`) which is database name
+- `aws_ssm_parameter.db_hostname`: This resource will create key value in ssm parameter (`dbhostname`) which has value of database endpoint address that application will use to connect
 
 ```sh
 # Save database values in SSM parameter store
@@ -787,9 +778,9 @@ SSM Parameter Store Values
 
 This section describes how the application gets deployed on EC2 instances managed by autoscaling group. To deploy the application we are using launch configuration along with autoscaling group which scale In or Out instances based on high resource utilization such as CPU. Resource utilization is monitored by Cloudwatch and triggered an alert in case of metrics reach the threshold limit. Instances get the database values such as **(VTT_DBUSER, VTT_DBPASSWORD etc..)** from the SSM parameter store from the userdata script and it establishes the connection with multi-AZ RDS instance. EC2 instance need to pass the healthcheck at endpoint /heathcheck/ in order to pass the initial health check and register themselves under the Target Group . Application load balancer will send the traffic to the healthy targets. Below is a detailed description of how to configure the launch configuration and autoscaling group.
 
-`aws_launch_configuration.APP-LC`: This resource will create the lauch configuration `APP-LC` and will use userdata script (**userdata-asg.sh**) to install the artifact generated and upload on S3 bucket in the circleci pipeline second stage which is `build` stage.
-`aws_autoscaling_group.APP-ASG`: This resource will create autoscaling group with lauch configuration `APP-LC` attached to it.
-`aws_autoscaling_attachment.asg_attachment_bar`: This resource attach the autoscaling group with the ALB Target group and registered the application instances
+- `aws_launch_configuration.APP-LC`: This resource will create the lauch configuration `APP-LC` and will use userdata script (**userdata-asg.sh**) to install the artifact generated and upload on S3 bucket in the circleci pipeline second stage which is `build` stage.
+- `aws_autoscaling_group.APP-ASG`: This resource will create autoscaling group with lauch configuration `APP-LC` attached to it.
+- `aws_autoscaling_attachment.asg_attachment_bar`: This resource attach the autoscaling group with the ALB Target group and registered the application instances
 
 ```sh
 ############ LAUCH Config & Auto Scaling Group ########
@@ -878,14 +869,14 @@ In order to scale up and scale down autoscaling group we need to setup autoscali
 
 **Below, I have also mentioned the terraform code for memory based alarm and auto scaling policy.**
 
-`aws_autoscaling_policy.agents-scale-up-cpu`: This resource will create autoscaling policy to scale up the instances based on high cpu utilization
-`aws_autoscaling_policy.agents-scale-down-cpu`: This resource will create autoscaling policy to scale down the instances based on low cpu utilization
-`aws_autoscaling_policy.agents-scale-up-mem`: This resource will create autoscaling policy to scale up the instances based on high memory utilization
-`aws_autoscaling_policy.agents-scale-down-mem`: This resource will create autoscaling policy to scale up the instances based on low memory utilization
-`aws_cloudwatch_metric_alarm.memory-high`: This resource will create cloudwatch alarm for high memory usage
-`aws_cloudwatch_metric_alarm.memory-low`: This resource will create cloudwatch alarm for low memory usage
-`aws_cloudwatch_metric_alarm.cpu-high`: This resource will create cloudwatch alarm for high cpu usage
-`aws_cloudwatch_metric_alarm.cpu-low`: This resource will create cloudwatch alarm for low cpu usage
+- `aws_autoscaling_policy.agents-scale-up-cpu`: This resource will create autoscaling policy to scale up the instances based on high cpu utilization
+- `aws_autoscaling_policy.agents-scale-down-cpu`: This resource will create autoscaling policy to scale down the instances based on low cpu utilization
+- `aws_autoscaling_policy.agents-scale-up-mem`: This resource will create autoscaling policy to scale up the instances based on high memory utilization
+- `aws_autoscaling_policy.agents-scale-down-mem`: This resource will create autoscaling policy to scale up the instances based on low memory utilization
+- `aws_cloudwatch_metric_alarm.memory-high`: This resource will create cloudwatch alarm for high memory usage
+- `aws_cloudwatch_metric_alarm.memory-low`: This resource will create cloudwatch alarm for low memory usage
+- `aws_cloudwatch_metric_alarm.cpu-high`: This resource will create cloudwatch alarm for high cpu usage
+- `aws_cloudwatch_metric_alarm.cpu-low`: This resource will create cloudwatch alarm for low cpu usage
 
 ```sh
 ##Auto scaling Policy for APP-ASG
@@ -1005,9 +996,9 @@ resource "aws_autoscaling_policy" "agents-scale-down-mem" {
 
 To access the application from internet we are going to create application load balancer and need to register the EC2 instances under Target group. Once the instances registered and passes the health checks, application should be accessible via ALB dns name and should be able to forward all incoming requests at port 80 to backend instances on port 3000
 
-`aws_lb.app-alb`: This resource will create Application Load balancer
-`aws_lb_target_group.APP-TargetGroup`: This resource will create Target Group
-`aws_lb_listener-app-alb-Listener`: This resource will create ALB listener
+- `aws_lb.app-alb`: This resource will create Application Load balancer
+- `aws_lb_target_group.APP-TargetGroup`: This resource will create Target Group
+- `aws_lb_listener-app-alb-Listener`: This resource will create ALB listener
 
 ```sh
 ## Application Load balancer
