@@ -5,10 +5,10 @@ This step-by-step tutorial explains how to deploy Servian TechChallenge App usin
 **I have tested this setup on AWS region `us-east-1` and also the terraform variable.tf file has values set as per the region `us-east-1` so i recommend to use the same region. If you want to test and deploy the resources in any other region then it requires changes mentioned here --> [**b**](#b)**.
 
 - [Table of Contents](#table-of-contents)
-  - [**Circle CI/CD pipeline**](#circle-cicd-pipeline)
+  - [**CircleCI Pipeline**](#circle-cicd-pipeline)
     - [**Prerequisites**](#prerequisites)
       - [Add environment variable in the circleci project](#add-environment-variable-in-the-circleci-project)
-    - [**CI/CD Pipeline Stages**](#ci/cd-pipeline-stages)
+    - [**CircleCI Pipeline Stages**](#circleci-pipeline-stages)
       - [terraform_backend](#terraform_backend)
       - [build](#build)
       - [terraform_deploy](#terraform_deploy)
@@ -95,7 +95,7 @@ Successful pipeline will look something like this:
 
 ![pipeline-stages.PNG](images/pipeline-stages.PNG)
 
-#### **CI/CD Pipeline Stages**
+#### **CircleCI Pipeline Stages**
 
 - #### **terraform_backend**
 
