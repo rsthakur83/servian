@@ -63,7 +63,7 @@ I have found that when we add new github project in circleci, it ask for **Commi
   
 #### b)
 
- One more important thing, if you want to deploy resources in any other AWS region than **us-east-1** then change these four values (`aws_region, az_zone_1, az_zone_2, image_id`) in `variables.tf` located under the folder `servian/app/deploy`.
+ One more important thing if you want to deploy resources in any other AWS region than **us-east-1** then change these four values (`aws_region, az_zone_1, az_zone_2, image_id`) in `variables.tf` located under the folder `servian/app/deploy`.
 
 ### **Add environment variable in the CircleCI project**
 
