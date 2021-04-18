@@ -19,7 +19,7 @@ This step-by-step tutorial explains how to deploy Servian TechChallenge App usin
 
     Let’s go through each of the tiers:
     - [**Tier 1: Public access - Application Load balancer**](#tier-1-public-access---application-load-balancer)
-    - [**Tier 2: Restricted access - App servers in private subnet**](#tier-2-restricted-access---app-servers-in-private-subnet)
+    - [**Tier 2: Restricted access - App Servers in private subnet**](#tier-2-restricted-access---app-servers-in-private-subnet)
     - [**Tier 3: Restricted access - Database Running in private Subnet**](#tier-3-restricted-access---database-running-in-private-subnet)
 
   - **[Detail description of the Terraform code in the Three-Tier AWS architecture](#Detail-description-of-the-Terraform-code-in-the-Three-Tier-AWS-architecture)**
