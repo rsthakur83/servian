@@ -8,7 +8,7 @@ This step-by-step tutorial explains how to deploy Servian TechChallenge App usin
   - [**Circle CI/CD pipeline**](#circle-cicd-pipeline)
     - [**Prerequisites**](#prerequisites)
       - [Add environment variable in the circleci project](#add-environment-variable-in-the-circleci-project)
-    - [**CI/CD Stages**](#ci/cd-stages)
+    - [**CI/CD Pipeline Stages**](#ci/cd-pipeline-stages)
       - [terraform_backend](#terraform_backend)
       - [build](#build)
       - [terraform_deploy](#terraform_deploy)
@@ -95,7 +95,7 @@ Successful pipeline will look something like this:
 
 ![pipeline-stages.PNG](images/pipeline-stages.PNG)
 
-#### **CI/CD Stages**
+#### **CI/CD Pipeline Stages**
 
 - #### **terraform_backend**
 
