@@ -62,18 +62,24 @@ git clone https://github.com/rsthakur83/TechChallengeApp-EC2.git
 
 **a**)
 
-I have found that when we add new github project in circleci, it ask for **Commit and Run** on the newly added github project. Because we have not set all the environmental variable yet for the project so i recommend here that trigger the build by choosing (`Commit and run`) then cancel it at the same time then go to the project again to set all the environmental variables mentioned in the below section.
-  
+After adding new github project in circleci, it ask for option **Start Building** then click on it. And because we have not set all the environmental variable yet for the project so after clicking the **Start Building** option cancel it at the same time then go to the project again to set all the environmental variables mentioned in the below section.
+
+![start-building.png](images/start-building.PNG)  
+
 #### b)
 
- One more important thing if you want to deploy resources in any other AWS region than **us-east-1** then change these four values (`aws_region, az_zone_1, az_zone_2, image_id`) in `variables.tf` located under the folder `servian/app/deploy`.
+One more important thing if you want to deploy resources in any other AWS region than **us-east-1** then change these four values (`aws_region, az_zone_1, az_zone_2, image_id`) as per that region in the `variables.tf` file located in the path `servian/app/deploy`.
 
 ### **Add environment variable in the CircleCI project**
 
 ![environment-variable.png](images/environment-variable.png)
-I have added the below variables using Circleci WebUI due to security reasons because some variables contains secret values such as aws access key & access key id, github token which we don't want to show in github repo.
+I have added the below variables using Circleci WebUI due to security reasons because some variables contains secret values such as aws access key id & secret access key id, github token which we don't want to show in github repo.
 
-- **GITHUB_TOKEN**: Configure the github token by choosing the option personal access tokens from the github setting -> then developer setting -> Personal access tokens. This token will be used to create the release in the repo.
+- **GITHUB_TOKEN**: Generate the github token by choosing the option personal access tokens from the github setting -> then developer
+ setting -> Personal access tokens and give it permission to write permission as highlighed below. This token will be used to create
+the release on the repo.
+
+![upload-package-permission.PNG](images/upload-package-permission.PNG)
 
 - **app_artifact_bucket**: Choose the unique name of S3 bucket otherwise build stage will fail so make sure this bucket name do not exist before. This bucket will be used to store the build stage artifact.
 
@@ -86,7 +92,7 @@ I have added the below variables using Circleci WebUI due to security reasons be
 - [**aws_region**](#aws-_-region): Set the AWS region (for example us-east-1) where you want to deploy the app, other AWS resources.
 
 - **terraform_state_bucket**: Again choose the unique S3 bucket name. This bucket will be used to store the terraform state file.
-- **image_ami_id**: AMI image id of ec2 instance as per the AWS region, for us-east-1 set it as **ami-042e8287309f5df03**  this is the current defaul value set in `variables.tf` file.
+- **image_ami_id**: AMI image id of ec2 instance as per the AWS region, for us-east-1 set it as **ami-042e8287309f5df03**  this is the current default value set in `variables.tf` file.
 
 After github repo integrated with circleci and environmental variable configured. Now its time to trigger the pipeline, to start the pipeline click on the rerun workflow from start option on the right side of the pipeline as highlighted in this diagram.
 
@@ -1101,32 +1107,32 @@ asg="APP-ASG"
 lc=`aws autoscaling describe-launch-configurations --region aws-region|grep LaunchConfigurationName|awk '{print $2}'|tail -1|cut -d '"' -f2`
 
 if [ "$lc" == "$lcfg1" ];then
-	### Creating LC2 Lauch Config and Updating ASG
-	echo "Creating LC2 Lauch Config and Updating ASG"
-	vpc=`aws ec2 describe-vpcs --filters Name=tag:Name,Values='Servian App VPC' --query 'Vpcs[*].VpcId' --output text`
-	sg=`aws ec2  describe-security-groups --filter Name=vpc-id,Values=$vpc  Name=tag:Name,Values='APP SG' --region aws-region --query 'SecurityGroups[*].[GroupId]' --output text`
-	aws autoscaling create-launch-configuration --launch-configuration-name $lcfg2 --key-name serkey --image-id ami-042e8287309f5df03 --instance-type t2.micro --iam-instance-profile  cwdb_iam_profile --security-groups $sg  --user-data file:///root/project/app/deploy/userdata-asg.sh
-	aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg2 --min-size 4 --max-size 4
-	sleep 150
-	aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg2 --min-size 2 --max-size 3 --desired-capacity 2
-	sleep 60
-	aws autoscaling delete-launch-configuration --launch-configuration-name $lcfg1
+        ### Creating LC2 Lauch Config and Updating ASG
+        echo "Creating LC2 Lauch Config and Updating ASG"
+        vpc=`aws ec2 describe-vpcs --filters Name=tag:Name,Values='Servian App VPC' --query 'Vpcs[*].VpcId' --output text`
+        sg=`aws ec2  describe-security-groups --filter Name=vpc-id,Values=$vpc  Name=tag:Name,Values='APP SG' --region aws-region --query 'SecurityGroups[*].[GroupId]' --output text`
+        aws autoscaling create-launch-configuration --launch-configuration-name $lcfg2  --image-id ami-id --instance-type t2.micro --iam-instance-profile  cwdb_iam_profile --security-groups $sg  --user-data file:///root/project/app/deploy/userdata-asg.sh
+        aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg2 --min-size 4 --max-size 4
+        sleep 150
+        aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg2 --min-size 2 --max-size 3 --desired-capacity 2
+        sleep 60
+        aws autoscaling delete-launch-configuration --launch-configuration-name $lcfg1
 
 elif [ "$lc" == "$lcfg2" ];then
-	### Creating LC Lauch Config and Updating ASG
-	echo "Creating LC Lauch Config and Updating ASG"
-	vpc=`aws ec2 describe-vpcs --filters Name=tag:Name,Values='Servian App VPC' --query 'Vpcs[*].VpcId' --output text`
-	sg=`aws ec2  describe-security-groups --filter Name=vpc-id,Values=$vpc  Name=tag:Name,Values='APP SG' --region aws-region --query 'SecurityGroups[*].[GroupId]' --output text`	
-	aws autoscaling create-launch-configuration --launch-configuration-name $lcfg1 --key-name serkey --image-id ami-042e8287309f5df03 --instance-type t2.micro --iam-instance-profile  cwdb_iam_profile --security-groups $sg  --user-data file:///root/project/app/deploy/userdata-asg.sh
-	aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg1 --min-size 4 --max-size 4
-	sleep 150
-	aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg1 --min-size 2 --max-size 3 --desired-capacity 2
-	sleep 60
-	aws autoscaling delete-launch-configuration --launch-configuration-name $lcfg2
+        ### Creating LC Lauch Config and Updating ASG
+        echo "Creating LC Lauch Config and Updating ASG"
+        vpc=`aws ec2 describe-vpcs --filters Name=tag:Name,Values='Servian App VPC' --query 'Vpcs[*].VpcId' --output text`
+        sg=`aws ec2  describe-security-groups --filter Name=vpc-id,Values=$vpc  Name=tag:Name,Values='APP SG' --region aws-region --query 'SecurityGroups[*].[GroupId]' --output text`
+        aws autoscaling create-launch-configuration --launch-configuration-name $lcfg1  --image-id ami-id --instance-type t2.micro --iam-instance-profile  cwdb_iam_profile --security-groups $sg  --user-data file:///root/project/app/deploy/userdata-asg.sh
+        aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg1 --min-size 4 --max-size 4
+        sleep 150
+        aws autoscaling update-auto-scaling-group --auto-scaling-group-name $asg --launch-configuration-name $lcfg1 --min-size 2 --max-size 3 --desired-capacity 2
+        sleep 60
+        aws autoscaling delete-launch-configuration --launch-configuration-name $lcfg2
 
 else
-	### Creating Three Tier Architecture and deploying Servian APP on AWS using terraform
+        ### Creating Three Tier Architecture and deploying Servian APP on AWS using terraform
         cd deploy;terraform init;terraform plan ;terraform apply --auto-approve  #-var-file="var.tfvars" #-var-file="var.tfvars"
-	sleep 120
+        sleep 120
 fi
 ```

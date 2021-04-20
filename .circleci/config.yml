@@ -4,7 +4,6 @@ orbs:
 jobs:
   terraform_backend:
     docker:
-            #- image: hashicorp/terraform:light
       - image: golang:1.15
     description: Create S3 to store terraform state file  
     steps:
