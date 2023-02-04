@@ -6,7 +6,7 @@ if [ $? -eq 0 ]; then
         echo "Bucket Exist"
 else
         echo "Bucket Doest Not Exist Creating!!!!!"
-        ../terraform init
-        ../terraform plan
-        ../terraform apply --auto-approve
+        terraform init
+        terraform plan
+        terraform apply --auto-approve
 fi
