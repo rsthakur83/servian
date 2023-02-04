@@ -20,6 +20,6 @@ resource "aws_launch_configuration" "APP-LC-2" {
   instance_type        = "t2.micro"
   iam_instance_profile = "cwdb_iam_profile"
   security_groups      = ["sgid"]
-  user_data            = file("/root/servian/app/deploy/userdata-asg.sh")
+  user_data            = file("/root/project/servian/app/deploy/userdata-asg.sh")
   lifecycle { create_before_destroy = true }
 }
