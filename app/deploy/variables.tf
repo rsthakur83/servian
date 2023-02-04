@@ -85,7 +85,7 @@ variable "db_engine" {
 
 variable "db_engine_version" {
   description = "Database engine version"
-  default     = "10.7"
+  default     = "10.17"
 }
 
 variable "db_identifier" {
