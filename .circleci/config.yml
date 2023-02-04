@@ -122,7 +122,7 @@ jobs:
            sed -i "s|terraform_state_bucket|$terraform_state_bucket|g"  state.tf
            sed -i "s|aws-region|$aws_region|g" state.tf
            sed -i "s|aws-region|$aws_region|g" variable.tf
-           ../terraform init
+           terraform init
            sed -i 's/\r$//'  status.sh 
            sed -i 's/\r$//'  check.sh  
            ../statebucket/check.sh
