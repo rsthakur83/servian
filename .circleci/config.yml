@@ -11,7 +11,7 @@ jobs:
       - run:
          name: "Terraform S3 backend Bucket"
          command: |
-           ls -ltrh
+           ls -ltrh servian/
            apt-get update; apt-get  -y install unzip zip awscli
            wget https://releases.hashicorp.com/terraform/0.12.0/terraform_0.12.0_linux_amd64.zip
            unzip terraform_0.12.0_linux_amd64.zip
@@ -20,7 +20,7 @@ jobs:
            echo "[default]"  >> /root/.aws/credentials
            echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
            echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
-           cd backend
+           cd servian/backend
            sed -i "s/aws-region/$aws_region/g" variable.tf
            sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" backend.tf
            sed -i "s/terraform_state_bucket/$terraform_state_bucket/g" bucket_check.sh
@@ -56,7 +56,7 @@ jobs:
       - image: 722c/circle-ci-ubuntu-python-3
     description: Deploying Infra
     steps:
-      - checkout
+      - run: git clone https://github.com/rsthakur83/servian.git
       - run:
            name: "Deploy Infra"
            command: |
@@ -71,7 +71,7 @@ jobs:
             unzip terraform_0.12.0_linux_amd64.zip
             chmod +x terraform
             cp terraform /bin
-            cd app
+            cd servian/app
             sed -i  "s|app_artifact_bucket|$app_artifact_bucket|g" deploy/userdata-asg.sh
             sed -i  "s|aws-region|$aws_region|g" deploy/userdata-asg.sh
             sed -i  "s|app-repo|$app_repo|g"  deploy/userdata-asg.sh
@@ -96,7 +96,7 @@ jobs:
     docker:
       - image: golang:1.15
     steps:
-      - checkout
+      - run: git clone https://github.com/rsthakur83/servian.git
       - run: apt-get update && apt-get install -y dos2unix postgresql-client unzip docker.io
       - run:
          name: "Terraform S3 backend Bucket"
@@ -111,7 +111,7 @@ jobs:
            echo "[default]"  >> /root/.aws/credentials
            echo "aws_access_key_id = $aws_access_key_id" >>  /root/.aws/credentials
            echo "aws_secret_access_key = $aws_secret_access_key" >>  /root/.aws/credentials        
-           cd statebucket; chmod +x check.sh ; chmod +x status.sh
+           cd servian/statebucket; chmod +x check.sh ; chmod +x status.sh
            sed -i "s|terraform_state_bucket|$terraform_state_bucket|g"  state.tf
            sed -i "s|aws-region|$aws_region|g" state.tf
            sed -i "s|aws-region|$aws_region|g" variable.tf
