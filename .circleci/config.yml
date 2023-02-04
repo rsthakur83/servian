@@ -7,7 +7,7 @@ jobs:
       - image: golang:1.15
     description: Create S3 to store terraform state file  
     steps:
-      - checkout
+      - run: git clone -b "$CIRCLE_BRANCH" "$CIRCLE_REPOSITORY_URL"
       - run:
          name: "Terraform S3 backend Bucket"
          command: |
